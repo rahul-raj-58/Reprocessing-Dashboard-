@@ -188,6 +188,50 @@
             border-radius: 8px;
             border-left: 4px solid #c33;
             margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .error code {
+            background: rgba(0,0,0,0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .error strong {
+            color: #b22;
+        }
+
+        .manual-input-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .manual-input-section h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .manual-input-section textarea {
+            width: 100%;
+            height: 200px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-bottom: 12px;
+            resize: vertical;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .refresh-btn {
@@ -243,11 +287,29 @@
                     <div class="status-dot"></div>
                     <span id="status-text">Connecting...</span>
                 </div>
-                <button class="refresh-btn" onclick="fetchData()">Refresh Data</button>
+                <div style="display: flex; gap: 10px;">
+                    <button class="refresh-btn" onclick="fetchData()">Refresh Data</button>
+                    <button class="refresh-btn" onclick="document.getElementById('manual-input').style.display = 'block'" style="background: #95a5a6;">Or Input CSV</button>
+                </div>
             </div>
         </div>
 
         <div id="error-container"></div>
+
+        <div id="manual-input" class="manual-input-section" style="display: none;">
+            <h3>📋 Manual Data Input</h3>
+            <p style="color: #666; margin-bottom: 12px; font-size: 14px;">
+                If automatic sync isn't working, you can manually paste Metabase data here:<br>
+                1. Go to your Metabase question<br>
+                2. Click <strong>Download</strong> → Select <strong>CSV</strong><br>
+                3. Copy the CSV data and paste it below
+            </p>
+            <textarea id="csv-input" placeholder="Paste CSV data here..."></textarea>
+            <div class="button-group">
+                <button class="refresh-btn" onclick="parseCSVData()" style="background: #27ae60;">Load CSV Data</button>
+                <button class="refresh-btn" onclick="document.getElementById('manual-input').style.display = 'none'">Close</button>
+            </div>
+        </div>
 
         <div id="loading" class="loading" style="display: none;">
             Loading dashboard data...
@@ -386,43 +448,130 @@
                 document.getElementById('error-container').innerHTML = '';
                 updateStatus('Fetching data...', false);
 
-                const response = await fetch(
-                    `${METABASE_URL}/api/public/card/${QUESTION_ID}/query`,
-                    {
+                // Try multiple endpoints
+                let result = null;
+                let endpoint = '';
+
+                try {
+                    // Endpoint 1: Try public/card query with parameters
+                    endpoint = `${METABASE_URL}/api/public/card/${QUESTION_ID}/query`;
+                    console.log('Trying endpoint:', endpoint);
+                    const response1 = await fetch(endpoint, {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json'
                         }
-                    }
-                );
-
-                if (!response.ok) {
-                    throw new Error(`API Error: ${response.status}`);
-                }
-
-                const result = await response.json();
-                
-                if (!result.data || !result.data.rows) {
-                    throw new Error('No data found in response');
-                }
-
-                rawData = result.data.rows.map((row, idx) => {
-                    const cols = result.data.cols;
-                    const record = {};
-                    cols.forEach((col, colIdx) => {
-                        record[col.name] = row[colIdx];
                     });
+                    
+                    if (response1.ok) {
+                        result = await response1.json();
+                    }
+                } catch (e) {
+                    console.log('Endpoint 1 failed, trying alternative...');
+                }
+
+                if (!result) {
+                    try {
+                        // Endpoint 2: Try public/question endpoint
+                        endpoint = `${METABASE_URL}/api/public/question/${QUESTION_ID}`;
+                        console.log('Trying endpoint:', endpoint);
+                        const response2 = await fetch(endpoint, {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        
+                        if (response2.ok) {
+                            result = await response2.json();
+                        }
+                    } catch (e) {
+                        console.log('Endpoint 2 failed');
+                    }
+                }
+
+                if (!result) {
+                    throw new Error('Could not fetch from Metabase API. Please check: 1) Internet connection, 2) Question ID is correct, 3) Question is public');
+                }
+
+                // Parse the response based on structure
+                let rows = [];
+                let cols = [];
+
+                if (result.data && result.data.rows) {
+                    rows = result.data.rows;
+                    cols = result.data.cols;
+                } else if (result.data && result.data.results && result.data.results.rows) {
+                    rows = result.data.results.rows;
+                    cols = result.data.results.cols;
+                } else if (result.rows) {
+                    rows = result.rows;
+                    cols = result.cols || result.columns || [];
+                } else {
+                    throw new Error('Unexpected response format from Metabase');
+                }
+
+                if (!rows || rows.length === 0) {
+                    throw new Error('No data rows found in response');
+                }
+
+                // Map column names if needed
+                const columnMapping = {
+                    'S.SKU_ID': 'sku_id',
+                    's.sku_id': 'sku_id',
+                    'SKU_ID': 'sku_id',
+                    'S.SKU_CREATED_ON': 'sku_created_on',
+                    's.sku_created_on': 'sku_created_on',
+                    'SKU_CREATED_ON': 'sku_created_on',
+                    'LATEST_IMAGE_ADDED_TIME': 'latest_image_added_time',
+                    'LATEST_QC_DONE_TIME': 'latest_qc_done_time',
+                    'QC_DONE_COUNT': 'qc_done_count',
+                    'DISTINCT_IMAGE_COUNT': 'disticnt_image_count',
+                    'DISTICNT_IMAGE_COUNT': 'disticnt_image_count',
+                    'IMAGE_ADDON_COUNT': 'image_addon_count',
+                    'DAYS_BETWEEN_LATEST_IMAGE_AND_QC_DONE': 'days_between_latest_image_and_qc_done'
+                };
+
+                rawData = rows.map((row) => {
+                    const record = {};
+                    if (Array.isArray(row)) {
+                        // Array format
+                        cols.forEach((col, colIdx) => {
+                            const colName = typeof col === 'string' ? col : (col.name || col.display_name || '');
+                            const mappedName = columnMapping[colName] || columnMapping[colName.toUpperCase()] || colName.toLowerCase();
+                            record[mappedName] = row[colIdx];
+                        });
+                    } else {
+                        // Object format
+                        Object.keys(row).forEach(key => {
+                            const mappedName = columnMapping[key] || columnMapping[key.toUpperCase()] || key.toLowerCase();
+                            record[mappedName] = row[key];
+                        });
+                    }
                     return record;
                 });
 
-                console.log('Data loaded:', rawData.length, 'records');
+                if (rawData.length === 0) {
+                    throw new Error('No valid data records found');
+                }
+
+                console.log('Data loaded successfully:', rawData.length, 'records');
+                console.log('Sample record:', rawData[0]);
                 processData();
                 renderDashboard();
                 updateStatus('Connected', true);
 
             } catch (error) {
                 console.error('Fetch error:', error);
-                showError(`Failed to load data: ${error.message}`);
+                showError(`
+                    <strong>Connection Error:</strong> ${error.message}<br><br>
+                    <strong>Troubleshooting:</strong><br>
+                    1. Ensure your Metabase question is set to <strong>Public</strong><br>
+                    2. Check the Question ID: <code>${QUESTION_ID}</code><br>
+                    3. Verify internet connection<br>
+                    4. Try refreshing the page<br><br>
+                    <strong>Alternative:</strong> Export data from Metabase as CSV and paste it below to test the dashboard.
+                `);
                 updateStatus('Connection failed', false);
                 document.getElementById('loading').style.display = 'none';
             }
@@ -750,6 +899,65 @@
             if (chartInstances[chartId]) {
                 chartInstances[chartId].destroy();
                 delete chartInstances[chartId];
+            }
+        }
+
+        function parseCSVData() {
+            try {
+                const csvText = document.getElementById('csv-input').value.trim();
+                if (!csvText) {
+                    alert('Please paste CSV data');
+                    return;
+                }
+
+                const lines = csvText.split('\n');
+                if (lines.length < 2) {
+                    throw new Error('CSV must have header row and data rows');
+                }
+
+                // Parse header
+                const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/"/g, ''));
+                
+                // Parse data rows
+                rawData = [];
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+
+                    const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+                    const record = {};
+                    
+                    headers.forEach((header, idx) => {
+                        // Map column names
+                        let mappedName = header;
+                        if (header.includes('sku_id')) mappedName = 'sku_id';
+                        else if (header.includes('created')) mappedName = 'sku_created_on';
+                        else if (header.includes('image_added')) mappedName = 'latest_image_added_time';
+                        else if (header.includes('qc_done_time')) mappedName = 'latest_qc_done_time';
+                        else if (header.includes('qc_done_count')) mappedName = 'qc_done_count';
+                        else if (header.includes('distinct') || header.includes('disticnt')) mappedName = 'disticnt_image_count';
+                        else if (header.includes('addon')) mappedName = 'image_addon_count';
+                        else if (header.includes('days_between')) mappedName = 'days_between_latest_image_and_qc_done';
+                        
+                        record[mappedName] = values[idx] || '';
+                    });
+                    
+                    rawData.push(record);
+                }
+
+                if (rawData.length === 0) {
+                    throw new Error('No valid data rows found');
+                }
+
+                console.log('CSV parsed:', rawData.length, 'records');
+                document.getElementById('manual-input').style.display = 'none';
+                processData();
+                renderDashboard();
+                updateStatus('Loaded from CSV', true);
+
+            } catch (error) {
+                alert('Error parsing CSV: ' + error.message);
+                console.error(error);
             }
         }
 
