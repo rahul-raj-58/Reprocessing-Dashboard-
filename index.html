@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SKU Reprocessing Monitor</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -145,11 +146,6 @@
             font-weight: 700;
             color: var(--color-purple);
             margin-bottom: 4px;
-        }
-
-        .metric-change {
-            font-size: 11px;
-            color: var(--text-muted);
         }
 
         .section-title {
@@ -329,12 +325,6 @@
             margin-top: 32px;
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-secondary);
-        }
-
         @media (max-width: 1024px) {
             .charts-grid {
                 grid-template-columns: 1fr;
@@ -491,8 +481,7 @@
     </div>
 
     <script>
-        const METABASE_URL = 'https://metabase.spyne.ai';
-        const QUESTION_ID = '6ecd9fc8-a838-4d49-9f67-efde76b85c2c';
+        const CSV_URL = 'https://metabase.spyne.ai/public/question/6ecd9fc8-a838-4d49-9f67-efde76b85c2c.csv';
 
         let dashboardData = { rows: [], lastUpdate: null };
         let chartInstances = {};
@@ -509,112 +498,49 @@
             }
         }
 
-        async function fetchWithRetry(url, options = {}) {
-            const maxRetries = 3;
-            for (let i = 0; i < maxRetries; i++) {
-                try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 10000);
-                    
-                    const response = await fetch(url, {
-                        ...options,
-                        signal: controller.signal
-                    });
-                    
-                    clearTimeout(timeoutId);
-                    
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}`);
-                    }
-                    
-                    return await response.json();
-                } catch (error) {
-                    if (i === maxRetries - 1) throw error;
-                    await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
-                }
-            }
-        }
-
-        async function fetchData() {
-            showMessage('Fetching data from Metabase... (Attempt 1/3)', 'loading');
+        async function fetchCSVData() {
+            showMessage('Loading data from Metabase CSV...', 'loading');
             try {
-                // Try direct fetch first
-                const directUrl = `${METABASE_URL}/api/public/card/${QUESTION_ID}/query/json`;
-                console.log('Attempting direct fetch from:', directUrl);
+                console.log('Fetching CSV from:', CSV_URL);
                 
-                const data = await fetchWithRetry(directUrl);
-                console.log('✅ Direct fetch successful');
-                dashboardData.rows = processMetabaseData(data);
-                dashboardData.lastUpdate = new Date();
-                
-                if (dashboardData.rows.length === 0) {
-                    showMessage('⚠️ No data in Metabase response', 'error');
-                    return;
+                const response = await fetch(CSV_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
-                showMessage(`✅ Data loaded successfully! (${dashboardData.rows.length} SKUs)`, 'success');
-                updateDashboard();
-            } catch (directError) {
-                console.warn('Direct fetch failed:', directError);
-                showMessage('Direct fetch failed, trying CORS proxy...', 'info');
+                const csvText = await response.text();
+                console.log('CSV fetched successfully, parsing...');
                 
-                try {
-                    // Try CORS proxy
-                    const corsUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(`${METABASE_URL}/api/public/card/${QUESTION_ID}/query/json`)}`;
-                    console.log('Attempting CORS proxy fetch');
-                    
-                    const data = await fetchWithRetry(corsUrl);
-                    console.log('✅ CORS proxy fetch successful');
-                    dashboardData.rows = processMetabaseData(data);
-                    dashboardData.lastUpdate = new Date();
-                    
-                    if (dashboardData.rows.length === 0) {
-                        showMessage('⚠️ No data in Metabase response', 'error');
-                        return;
+                // Parse CSV using PapaParse
+                Papa.parse(csvText, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        console.log(`Parsed ${results.data.length} records`);
+                        
+                        if (results.data.length === 0) {
+                            showMessage('❌ No data found in CSV', 'error');
+                            return;
+                        }
+                        
+                        dashboardData.rows = results.data;
+                        dashboardData.lastUpdate = new Date();
+                        
+                        console.log('Data processed successfully');
+                        console.log('Sample row:', results.data[0]);
+                        
+                        showMessage(`✅ Data loaded successfully! (${results.data.length} SKUs)`, 'success');
+                        updateDashboard();
+                    },
+                    error: function(error) {
+                        console.error('CSV parsing error:', error);
+                        showMessage(`❌ Error parsing CSV: ${error.message}`, 'error');
                     }
-                    
-                    showMessage(`✅ Data loaded successfully via proxy! (${dashboardData.rows.length} SKUs)`, 'success');
-                    updateDashboard();
-                } catch (corsError) {
-                    console.error('All fetch methods failed:', corsError);
-                    showMessage(
-                        `❌ Could not load data: ${corsError.message}. ` +
-                        `Check if Metabase is accessible and the Question ID is correct. ` +
-                        `Open browser console (F12) for details.`,
-                        'error'
-                    );
-                }
-            }
-        }
-
-        function processMetabaseData(data) {
-            let rows = [];
-            
-            if (Array.isArray(data)) {
-                if (data[0] && typeof data[0] === 'object' && !Array.isArray(data[0])) {
-                    rows = data;
-                } else if (data[0] && Array.isArray(data[0])) {
-                    const headers = data[0];
-                    rows = data.slice(1).map(row => {
-                        const obj = {};
-                        headers.forEach((header, idx) => {
-                            obj[header] = row[idx];
-                        });
-                        return obj;
-                    });
-                }
-            } else if (data.data && data.data.rows && data.data.columns) {
-                const headers = data.data.columns.map(col => col.name || col);
-                rows = data.data.rows.map(row => {
-                    const obj = {};
-                    headers.forEach((header, idx) => {
-                        obj[header] = row[idx];
-                    });
-                    return obj;
                 });
+            } catch (error) {
+                console.error('Error fetching CSV:', error);
+                showMessage(`❌ Error loading data: ${error.message}`, 'error');
             }
-            
-            return rows;
         }
 
         function updateDashboard() {
@@ -644,14 +570,14 @@
             const avgDays = count > 0 ? (totalDays / count).toFixed(1) : '0';
             document.getElementById('avgDaysQc').textContent = avgDays;
 
-            const enterprises = new Set(rows.map(r => r['enterprise_name'])).size;
+            const enterprises = new Set(rows.map(r => r['enterprise_name']).filter(x => x)).size;
             document.getElementById('activeEnterprises').textContent = enterprises;
 
-            const pocs = new Set(rows.filter(r => r['cs_poc_email']).map(r => r['cs_poc_email'])).size;
+            const pocs = new Set(rows.filter(r => r['cs_poc_email']).map(r => r['cs_poc_email']).filter(x => x)).size;
             document.getElementById('activePocs').textContent = pocs;
 
             const qcCompleted = rows.filter(r => r['qc_done_count'] > 0).length;
-            const qcRate = ((qcCompleted / rows.length) * 100).toFixed(1);
+            const qcRate = rows.length > 0 ? ((qcCompleted / rows.length) * 100).toFixed(1) : '0';
             document.getElementById('qcRate').textContent = qcRate + '%';
         }
 
@@ -662,7 +588,7 @@
             rows.forEach(r => {
                 const dateStr = String(r['latest_image_added_on'] || '');
                 const date = dateStr.split('T')[0];
-                if (date) dailyData[date] = (dailyData[date] || 0) + 1;
+                if (date && date !== '') dailyData[date] = (dailyData[date] || 0) + 1;
             });
 
             const sortedDates = Object.keys(dailyData).sort().slice(-30);
@@ -672,7 +598,13 @@
             chartInstances.trend = new Chart(document.getElementById('trendChart'), {
                 type: 'line',
                 data: {
-                    labels: sortedDates.map(d => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
+                    labels: sortedDates.map(d => {
+                        try {
+                            return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                        } catch (e) {
+                            return d;
+                        }
+                    }),
                     datasets: [{
                         label: 'SKUs Reprocessed',
                         data: trendValues,
@@ -758,7 +690,7 @@
                 .sort((a, b) => b[1].today - a[1].today)
                 .map(([name, stats]) => {
                     const avgDays = stats.daysCount > 0 ? (stats.totalDays / stats.daysCount).toFixed(1) : '0';
-                    const arr = stats.arr ? `$${(stats.arr / 1000).toFixed(0)}K` : 'N/A';
+                    const arr = stats.arr ? `$${(parseFloat(stats.arr) / 1000).toFixed(0)}K` : 'N/A';
                     return `<tr>
                         <td><strong>${name}</strong></td>
                         <td><span class="badge badge-info">${stats.stage}</span></td>
@@ -791,7 +723,7 @@
                 .slice(0, 15)
                 .map(([email, stats]) => {
                     const avgDays = stats.daysCount > 0 ? (stats.totalDays / stats.daysCount).toFixed(1) : '0';
-                    const rate = ((stats.today / stats.total) * 100).toFixed(1);
+                    const rate = stats.total > 0 ? ((stats.today / stats.total) * 100).toFixed(1) : '0';
                     return `<tr>
                         <td>${email}</td>
                         <td>${stats.ent}</td>
@@ -820,7 +752,7 @@
                 .sort((a, b) => b[1].today - a[1].today)
                 .slice(0, 15)
                 .map(([email, stats]) => {
-                    const rate = ((stats.today / stats.total) * 100).toFixed(1);
+                    const rate = stats.total > 0 ? ((stats.today / stats.total) * 100).toFixed(1) : '0';
                     return `<tr>
                         <td>${email}</td>
                         <td>${stats.ent}</td>
@@ -840,9 +772,9 @@
         }
 
         window.addEventListener('load', () => {
-            console.log('Dashboard loaded. Starting data fetch...');
-            fetchData();
-            setInterval(fetchData, 5 * 60 * 1000);
+            console.log('Dashboard loaded. Starting CSV data fetch...');
+            fetchCSVData();
+            setInterval(fetchCSVData, 5 * 60 * 1000);
         });
     </script>
 </body>
