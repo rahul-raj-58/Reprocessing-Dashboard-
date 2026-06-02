@@ -13,31 +13,28 @@
         }
 
         :root {
-            --bg-primary: #0f1419;
-            --bg-secondary: #1a1f2e;
-            --bg-tertiary: #252d3d;
-            --text-primary: #e4e6eb;
-            --text-secondary: #b0b3b8;
-            --text-muted: #65676b;
-            --border-color: #404854;
-            
-            --color-purple: #8b5cf6;
-            --color-purple-light: #a78bfa;
-            --color-blue: #3b82f6;
-            --color-blue-light: #60a5fa;
-            --color-cyan: #06b6d4;
-            --color-teal: #14b8a6;
+            --bg-primary: #0a0e17;
+            --bg-secondary: #141b2f;
+            --bg-tertiary: #1e2747;
+            --text-primary: #e8ecf1;
+            --text-secondary: #a0a9b8;
+            --text-muted: #6b7280;
+            --border-color: #2a3350;
+            --color-purple: #a78bfa;
+            --color-pink: #f472b6;
+            --color-blue: #60a5fa;
             --color-emerald: #10b981;
-            --color-lime: #84cc16;
-            --color-yellow: #eab308;
             --color-orange: #f97316;
-            --color-rose: #f43f5e;
-            --color-pink: #ec4899;
+            --color-red: #ef4444;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
+            background: linear-gradient(135deg, #0a0e17 0%, #141b2f 100%);
             color: var(--text-primary);
             min-height: 100vh;
             line-height: 1.6;
@@ -58,40 +55,33 @@
             gap: 20px;
         }
 
-        .header-left {
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
-        .logo {
-            font-size: 32px;
-        }
-
-        h1 {
-            font-size: 28px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
         .status-badge {
             background: var(--bg-tertiary);
             border: 1px solid var(--border-color);
-            padding: 6px 12px;
+            padding: 8px 16px;
             border-radius: 20px;
             font-size: 12px;
             color: var(--text-secondary);
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
 
-        .status-badge .dot {
-            width: 6px;
-            height: 6px;
+        .status-dot {
+            width: 8px;
+            height: 8px;
             background: var(--color-emerald);
             border-radius: 50%;
             animation: pulse 2s infinite;
@@ -104,8 +94,8 @@
 
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
             margin-bottom: 32px;
         }
 
@@ -113,7 +103,7 @@
             background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 24px;
+            padding: 20px;
             position: relative;
             overflow: hidden;
             transition: all 0.3s ease;
@@ -121,7 +111,7 @@
 
         .metric-card:hover {
             border-color: var(--color-purple);
-            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.2);
             transform: translateY(-2px);
         }
 
@@ -131,7 +121,7 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 3px;
+            height: 2px;
             background: linear-gradient(90deg, var(--color-purple), var(--color-pink));
             opacity: 0;
             transition: opacity 0.3s ease;
@@ -142,7 +132,7 @@
         }
 
         .metric-label {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -151,23 +141,15 @@
         }
 
         .metric-value {
-            font-size: 36px;
+            font-size: 32px;
             font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 8px;
+            color: var(--color-purple);
+            margin-bottom: 4px;
         }
 
         .metric-change {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
-        }
-
-        .metric-change.positive {
-            color: var(--color-emerald);
-        }
-
-        .section {
-            margin-bottom: 32px;
         }
 
         .section-title {
@@ -188,14 +170,6 @@
             border-radius: 2px;
         }
 
-        .chart-container {
-            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 20px;
-        }
-
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -203,9 +177,16 @@
             margin-bottom: 32px;
         }
 
+        .chart-container {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
         .chart-wrapper {
             position: relative;
-            height: 320px;
+            height: 300px;
         }
 
         .table-container {
@@ -217,8 +198,8 @@
         }
 
         .table-header {
-            padding: 20px 24px;
-            background: rgba(139, 92, 246, 0.05);
+            padding: 16px 20px;
+            background: rgba(167, 139, 250, 0.05);
             border-bottom: 1px solid var(--border-color);
         }
 
@@ -232,54 +213,41 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         thead tr {
             background: rgba(0, 0, 0, 0.2);
-            border-bottom: 1px solid var(--border-color);
         }
 
         th {
-            padding: 16px 24px;
+            padding: 12px 16px;
             text-align: left;
             font-weight: 600;
-            color: var(--color-purple-light);
+            color: var(--color-purple);
             text-transform: uppercase;
-            font-size: 12px;
+            font-size: 11px;
             letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color);
         }
 
         td {
-            padding: 16px 24px;
+            padding: 12px 16px;
             border-bottom: 1px solid var(--border-color);
             color: var(--text-primary);
         }
 
-        tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        tbody tr {
-            transition: all 0.2s ease;
-        }
-
         tbody tr:hover {
-            background: rgba(139, 92, 246, 0.08);
+            background: rgba(167, 139, 250, 0.08);
         }
 
         .badge {
             display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 11px;
             font-weight: 600;
             white-space: nowrap;
-        }
-
-        .badge-primary {
-            background: rgba(139, 92, 246, 0.2);
-            color: var(--color-purple-light);
         }
 
         .badge-success {
@@ -293,13 +261,13 @@
         }
 
         .badge-danger {
-            background: rgba(244, 63, 94, 0.2);
-            color: var(--color-rose);
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--color-red);
         }
 
         .badge-info {
-            background: rgba(6, 182, 212, 0.2);
-            color: var(--color-cyan);
+            background: rgba(167, 139, 250, 0.2);
+            color: var(--color-purple);
         }
 
         .loading {
@@ -311,14 +279,13 @@
         }
 
         .spinner {
-            display: inline-block;
             width: 40px;
             height: 40px;
-            border: 3px solid rgba(139, 92, 246, 0.2);
+            border: 3px solid rgba(167, 139, 250, 0.2);
             border-top-color: var(--color-purple);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-right: 12px;
+            margin-right: 16px;
         }
 
         @keyframes spin {
@@ -336,9 +303,9 @@
         }
 
         .message.error {
-            background: rgba(244, 63, 94, 0.1);
-            color: var(--color-rose);
-            border: 1px solid rgba(244, 63, 94, 0.3);
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--color-red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
         .message.success {
@@ -347,35 +314,13 @@
             border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
-        .message.loading {
-            background: rgba(139, 92, 246, 0.1);
-            color: var(--color-purple-light);
-            border: 1px solid rgba(139, 92, 246, 0.3);
-        }
-
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-            margin-top: 8px;
-        }
-
-        .stat-item {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-        }
-
-        .stat-label {
+        .footer {
+            text-align: center;
+            padding: 24px;
             color: var(--text-muted);
-            margin-bottom: 4px;
-        }
-
-        .stat-value {
-            color: var(--color-purple-light);
-            font-weight: 700;
-            font-size: 16px;
+            font-size: 12px;
+            border-top: 1px solid var(--border-color);
+            margin-top: 32px;
         }
 
         .empty-state {
@@ -384,28 +329,15 @@
             color: var(--text-secondary);
         }
 
-        .empty-state p {
-            margin-bottom: 10px;
-        }
-
         @media (max-width: 1024px) {
             .charts-grid {
                 grid-template-columns: 1fr;
-            }
-
-            .metric-card {
-                min-width: 0;
             }
         }
 
         @media (max-width: 768px) {
             .container {
                 padding: 16px;
-            }
-
-            header {
-                flex-direction: column;
-                align-items: flex-start;
             }
 
             h1 {
@@ -421,41 +353,22 @@
             }
 
             th, td {
-                padding: 12px 16px;
+                padding: 10px 12px;
             }
 
             .chart-wrapper {
                 height: 250px;
             }
         }
-
-        .footer {
-            text-align: center;
-            padding: 24px;
-            color: var(--text-muted);
-            font-size: 12px;
-            border-top: 1px solid var(--border-color);
-            margin-top: 32px;
-        }
-
-        .gradient-text {
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <div class="header-left">
-                <div class="logo">📊</div>
-                <h1>SKU Reprocessing Monitor</h1>
-            </div>
+            <h1>📊 SKU Reprocessing Monitor</h1>
             <div class="status-badge">
-                <span class="dot"></span>
-                <span id="lastUpdate">Loading...</span>
+                <span class="status-dot"></span>
+                <span id="lastUpdate">Loading data...</span>
             </div>
         </header>
 
@@ -465,38 +378,32 @@
             <div class="metric-card">
                 <div class="metric-label">Total SKUs</div>
                 <div class="metric-value" id="totalSkus">-</div>
-                <div class="metric-change" id="totalSkusChange"></div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">Reprocessed Today</div>
-                <div class="metric-value gradient-text" id="reprocessedToday">-</div>
-                <div class="metric-change" id="reprocessedChange"></div>
+                <div class="metric-value" id="reprocessedToday">-</div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">Avg Days to QC</div>
                 <div class="metric-value" id="avgDaysQc">-</div>
-                <div class="metric-change" id="avgDaysChange"></div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">Active Enterprises</div>
                 <div class="metric-value" id="activeEnterprises">-</div>
-                <div class="metric-change" id="enterprisesChange"></div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">Active CS POCs</div>
                 <div class="metric-value" id="activePocs">-</div>
-                <div class="metric-change" id="pocsChange"></div>
             </div>
             <div class="metric-card">
-                <div class="metric-label">Avg Images/SKU</div>
-                <div class="metric-value" id="avgImages">-</div>
-                <div class="metric-change" id="imagesChange"></div>
+                <div class="metric-label">QC Completion Rate</div>
+                <div class="metric-value" id="qcRate">-</div>
             </div>
         </div>
 
         <div class="charts-grid">
             <div class="chart-container">
-                <h3 class="section-title" style="margin-bottom: 16px;">Daily Reprocessing Trend</h3>
+                <h3 class="section-title" style="margin-bottom: 16px;">Daily Reprocessing Trend (30 Days)</h3>
                 <div class="chart-wrapper">
                     <canvas id="trendChart"></canvas>
                 </div>
@@ -509,87 +416,71 @@
             </div>
         </div>
 
-        <div class="section">
-            <div class="section-title">Enterprise Performance</div>
-            <div class="table-container">
-                <div class="table-header">
-                    <h3>Top Enterprises by Daily Reprocessing</h3>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Enterprise Name</th>
-                            <th>Stage</th>
-                            <th>SKUs Today</th>
-                            <th>Total SKUs</th>
-                            <th>Avg Days to QC</th>
-                            <th>ARR</th>
-                            <th>Segment</th>
-                        </tr>
-                    </thead>
-                    <tbody id="enterpriseTable">
-                        <tr>
-                            <td colspan="7" style="text-align: center; padding: 40px;">Loading data...</td>
-                        </tr>
-                    </tbody>
-                </table>
+        <div class="table-container">
+            <div class="table-header">
+                <h3>Top Enterprises by Daily Reprocessing</h3>
             </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Enterprise Name</th>
+                        <th>Stage</th>
+                        <th>Today</th>
+                        <th>Total</th>
+                        <th>Avg Days QC</th>
+                        <th>ARR</th>
+                        <th>Segment</th>
+                    </tr>
+                </thead>
+                <tbody id="enterpriseTable">
+                    <tr><td colspan="7" style="text-align: center; padding: 40px;">Loading data...</td></tr>
+                </tbody>
+            </table>
         </div>
 
-        <div class="section">
-            <div class="section-title">CS POC Performance</div>
-            <div class="table-container">
-                <div class="table-header">
-                    <h3>Customer Success POC Metrics</h3>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>CS POC Email</th>
-                            <th>Enterprise</th>
-                            <th>SKUs Today</th>
-                            <th>Total SKUs Managed</th>
-                            <th>Avg Images/SKU</th>
-                            <th>Avg QC Time (days)</th>
-                            <th>Reprocessing Rate</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pocTable">
-                        <tr>
-                            <td colspan="7" style="text-align: center; padding: 40px;">Loading data...</td>
-                        </tr>
-                    </tbody>
-                </table>
+        <div class="table-container">
+            <div class="table-header">
+                <h3>CS POC Performance Metrics</h3>
             </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>CS POC Email</th>
+                        <th>Enterprise</th>
+                        <th>Today</th>
+                        <th>Total</th>
+                        <th>Avg Days</th>
+                        <th>Rate</th>
+                    </tr>
+                </thead>
+                <tbody id="pocTable">
+                    <tr><td colspan="6" style="text-align: center; padding: 40px;">Loading data...</td></tr>
+                </tbody>
+            </table>
         </div>
 
-        <div class="section">
-            <div class="section-title">OB POC Performance</div>
-            <div class="table-container">
-                <div class="table-header">
-                    <h3>Onboarding POC Metrics</h3>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>OB POC Email</th>
-                            <th>Enterprise</th>
-                            <th>SKUs Today</th>
-                            <th>Total SKUs</th>
-                            <th>Reprocessing Rate</th>
-                        </tr>
-                    </thead>
-                    <tbody id="obTable">
-                        <tr>
-                            <td colspan="5" style="text-align: center; padding: 40px;">Loading data...</td>
-                        </tr>
-                    </tbody>
-                </table>
+        <div class="table-container">
+            <div class="table-header">
+                <h3>OB POC Performance Metrics</h3>
             </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>OB POC Email</th>
+                        <th>Enterprise</th>
+                        <th>Today</th>
+                        <th>Total</th>
+                        <th>Rate</th>
+                    </tr>
+                </thead>
+                <tbody id="obTable">
+                    <tr><td colspan="5" style="text-align: center; padding: 40px;">Loading data...</td></tr>
+                </tbody>
+            </table>
         </div>
 
         <div class="footer">
-            <p>SKU Reprocessing Monitor • Real-time data from Metabase • Dark Mode Enabled</p>
+            <p>SKU Reprocessing Monitor • Real-time data from Metabase • Dark Mode Dashboard</p>
         </div>
     </div>
 
@@ -597,61 +488,42 @@
         const METABASE_URL = 'https://metabase.spyne.ai';
         const QUESTION_ID = '6ecd9fc8-a838-4d49-9f67-efde76b85c2c';
 
-        let dashboardData = {
-            rows: [],
-            lastUpdate: null
-        };
-
+        let dashboardData = { rows: [], lastUpdate: null };
         let chartInstances = {};
 
         function showMessage(message, type = 'loading') {
             const messageArea = document.getElementById('messageArea');
             let content = message;
-
             if (type === 'loading') {
                 content = `<div class="spinner"></div>${message}`;
             }
-
             messageArea.innerHTML = `<div class="message ${type}">${content}</div>`;
-
             if (type !== 'loading') {
-                setTimeout(() => {
-                    messageArea.innerHTML = '';
-                }, 5000);
+                setTimeout(() => { messageArea.innerHTML = ''; }, 5000);
             }
         }
 
         async function fetchData() {
-            showMessage('Loading data from Metabase...', 'loading');
-
+            showMessage('Fetching data from Metabase...', 'loading');
             try {
-                // Use Vercel API proxy
-                const apiUrl = `/api/getData?metabaseUrl=${encodeURIComponent(METABASE_URL)}&questionId=${encodeURIComponent(QUESTION_ID)}`;
-                
+                const apiUrl = `${METABASE_URL}/api/public/card/${QUESTION_ID}/query/json`;
                 const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`${errorData.error}: ${errorData.message || errorData.details || ''}`);
-                }
-
-                const result = await response.json();
-                
-                if (!result.success) {
-                    throw new Error(result.error || 'Unknown error');
-                }
-
-                dashboardData.rows = processMetabaseData(result.data);
+                const data = await response.json();
+                dashboardData.rows = processMetabaseData(data);
                 dashboardData.lastUpdate = new Date();
+                
+                if (dashboardData.rows.length === 0) {
+                    showMessage('❌ No data received from Metabase', 'error');
+                    return;
+                }
                 
                 showMessage(`✅ Data loaded successfully! (${dashboardData.rows.length} SKUs)`, 'success');
                 updateDashboard();
-                
             } catch (error) {
                 console.error('Error:', error);
-                showMessage(`❌ Error loading data: ${error.message}`, 'error');
-                // Try sample data
-                loadSampleData();
+                showMessage(`❌ Error: ${error.message}`, 'error');
             }
         }
 
@@ -659,11 +531,9 @@
             let rows = [];
             
             if (Array.isArray(data)) {
-                // If it's an array of objects
                 if (data[0] && typeof data[0] === 'object' && !Array.isArray(data[0])) {
                     rows = data;
                 } else if (data[0] && Array.isArray(data[0])) {
-                    // If it's array of arrays with headers in first row
                     const headers = data[0];
                     rows = data.slice(1).map(row => {
                         const obj = {};
@@ -673,8 +543,7 @@
                         return obj;
                     });
                 }
-            } else if (data.data && data.data.rows) {
-                // Metabase format with headers
+            } else if (data.data && data.data.rows && data.data.columns) {
                 const headers = data.data.columns.map(col => col.name || col);
                 rows = data.data.rows.map(row => {
                     const obj = {};
@@ -688,44 +557,7 @@
             return rows;
         }
 
-        function loadSampleData() {
-            showMessage('Loading sample data for demonstration...', 'loading');
-            
-            dashboardData.rows = [
-                {
-                    'sb.sku_id': 'SKU001',
-                    'sku_created_on': '2024-01-15',
-                    'latest_image_added_on': '2024-12-05',
-                    'distinct_image_count': 5,
-                    'image_addon_count': 3,
-                    'qc_done_count': 4,
-                    'qc_done_count_after_latest_image': 2,
-                    'latest_image_id': 'IMG001',
-                    'sku_most-recent_qc_time': '2024-12-05T10:30:00',
-                    'latest_qc_after_latest_image_time': '2024-12-05T14:20:00',
-                    'latest_image_qc_done_time': '2024-12-05T15:00:00',
-                    'days_betweem_latest_image_and-image_qc_done': 2.5,
-                    'days_between_latest_image_and_sku_qc_done': 3.2,
-                    'sb.enterprise_id': 'ENT001',
-                    'enterprise_name': 'Enterprise A',
-                    'customer-segment': 'Enterprise',
-                    'ed.stage': 'Growth',
-                    'cs_poc_email': 'john.doe@company.com',
-                    'ob_poc_email': 'onboard@company.com',
-                    'contracted_arr': 500000
-                }
-            ];
-            
-            dashboardData.lastUpdate = new Date();
-            updateDashboard();
-        }
-
         function updateDashboard() {
-            if (dashboardData.rows.length === 0) {
-                document.getElementById('messageArea').innerHTML = '<div class="empty-state"><p>No data available</p></div>';
-                return;
-            }
-
             updateMetrics();
             updateCharts();
             updateTables();
@@ -736,53 +568,41 @@
             const rows = dashboardData.rows;
             const today = new Date().toISOString().split('T')[0];
 
-            // Total SKUs
-            document.getElementById('totalSkus').textContent = rows.length;
+            document.getElementById('totalSkus').textContent = rows.length.toLocaleString();
 
-            // Reprocessed today
             const reprocessedToday = rows.filter(r => {
-                const dateStr = r['latest_image_added_on'] || '';
+                const dateStr = String(r['latest_image_added_on'] || '');
                 return dateStr.includes(today);
             }).length;
             document.getElementById('reprocessedToday').textContent = reprocessedToday;
 
-            // Avg days to QC
-            let totalDays = 0;
-            let count = 0;
+            let totalDays = 0, count = 0;
             rows.forEach(r => {
                 const days = parseFloat(r['days_betweem_latest_image_and-image_qc_done'] || 0);
-                if (days > 0) {
-                    totalDays += days;
-                    count++;
-                }
+                if (days > 0) { totalDays += days; count++; }
             });
-            const avgDays = count > 0 ? (totalDays / count).toFixed(1) : 0;
+            const avgDays = count > 0 ? (totalDays / count).toFixed(1) : '0';
             document.getElementById('avgDaysQc').textContent = avgDays;
 
-            // Active enterprises
             const enterprises = new Set(rows.map(r => r['enterprise_name'])).size;
             document.getElementById('activeEnterprises').textContent = enterprises;
 
-            // Active CS POCs
             const pocs = new Set(rows.filter(r => r['cs_poc_email']).map(r => r['cs_poc_email'])).size;
             document.getElementById('activePocs').textContent = pocs;
 
-            // Avg images per SKU
-            const avgImages = (rows.reduce((sum, r) => sum + (parseFloat(r['distinct_image_count']) || 0), 0) / rows.length).toFixed(1);
-            document.getElementById('avgImages').textContent = avgImages;
+            const qcCompleted = rows.filter(r => r['qc_done_count'] > 0).length;
+            const qcRate = ((qcCompleted / rows.length) * 100).toFixed(1);
+            document.getElementById('qcRate').textContent = qcRate + '%';
         }
 
         function updateCharts() {
             const rows = dashboardData.rows;
 
-            // Daily trend
             const dailyData = {};
             rows.forEach(r => {
-                const dateStr = r['latest_image_added_on'] || '';
+                const dateStr = String(r['latest_image_added_on'] || '');
                 const date = dateStr.split('T')[0];
-                if (date) {
-                    dailyData[date] = (dailyData[date] || 0) + 1;
-                }
+                if (date) dailyData[date] = (dailyData[date] || 0) + 1;
             });
 
             const sortedDates = Object.keys(dailyData).sort().slice(-30);
@@ -792,21 +612,18 @@
             chartInstances.trend = new Chart(document.getElementById('trendChart'), {
                 type: 'line',
                 data: {
-                    labels: sortedDates.map(d => {
-                        const date = new Date(d);
-                        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                    }),
+                    labels: sortedDates.map(d => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
                     datasets: [{
                         label: 'SKUs Reprocessed',
                         data: trendValues,
-                        borderColor: '#8b5cf6',
-                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        borderColor: '#a78bfa',
+                        backgroundColor: 'rgba(167, 139, 250, 0.1)',
                         borderWidth: 2,
                         tension: 0.4,
                         fill: true,
                         pointRadius: 4,
-                        pointBackgroundColor: '#8b5cf6',
-                        pointBorderColor: '#0f1419',
+                        pointBackgroundColor: '#a78bfa',
+                        pointBorderColor: '#0a0e17',
                         pointBorderWidth: 2
                     }]
                 },
@@ -815,39 +632,23 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            labels: {
-                                color: '#b0b3b8',
-                                usePointStyle: true,
-                                padding: 20,
-                                font: { size: 12 }
-                            }
+                            labels: { color: '#a0a9b8', usePointStyle: true, padding: 20, font: { size: 12 } }
                         }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            grid: {
-                                color: 'rgba(139, 92, 246, 0.1)',
-                                drawBorder: false
-                            },
-                            ticks: {
-                                color: '#b0b3b8'
-                            }
+                            grid: { color: 'rgba(167, 139, 250, 0.1)', drawBorder: false },
+                            ticks: { color: '#a0a9b8' }
                         },
                         x: {
-                            grid: {
-                                display: false,
-                                drawBorder: false
-                            },
-                            ticks: {
-                                color: '#b0b3b8'
-                            }
+                            grid: { display: false, drawBorder: false },
+                            ticks: { color: '#a0a9b8' }
                         }
                     }
                 }
             });
 
-            // QC Status
             const qcCompleted = rows.filter(r => r['qc_done_count'] > 0).length;
             const qcPending = rows.filter(r => r['qc_done_count'] === 0).length;
 
@@ -858,8 +659,8 @@
                     labels: ['QC Completed', 'Pending QC'],
                     datasets: [{
                         data: [qcCompleted, qcPending],
-                        backgroundColor: ['#10b981', '#ec4899'],
-                        borderColor: '#1a1f2e',
+                        backgroundColor: ['#10b981', '#f472b6'],
+                        borderColor: '#141b2f',
                         borderWidth: 2
                     }]
                 },
@@ -869,12 +670,7 @@
                     plugins: {
                         legend: {
                             position: 'bottom',
-                            labels: {
-                                color: '#b0b3b8',
-                                usePointStyle: true,
-                                padding: 20,
-                                font: { size: 12 }
-                            }
+                            labels: { color: '#a0a9b8', usePointStyle: true, padding: 20, font: { size: 12 } }
                         }
                     }
                 }
@@ -882,183 +678,110 @@
         }
 
         function updateTables() {
-            updateEnterpriseTable();
-            updatePocTable();
-            updateObTable();
-        }
-
-        function updateEnterpriseTable() {
             const rows = dashboardData.rows;
             const today = new Date().toISOString().split('T')[0];
 
+            // Enterprise table
             const enterpriseStats = {};
             rows.forEach(r => {
-                const enterprise = r['enterprise_name'] || 'Unknown';
-                if (!enterpriseStats[enterprise]) {
-                    enterpriseStats[enterprise] = {
-                        today: 0,
-                        total: 0,
-                        totalDays: 0,
-                        daysCount: 0,
-                        stage: r['ed.stage'] || 'N/A',
-                        segment: r['customer-segment'] || 'N/A',
-                        arr: r['contracted_arr'] || 0
-                    };
+                const ent = r['enterprise_name'] || 'Unknown';
+                if (!enterpriseStats[ent]) {
+                    enterpriseStats[ent] = { today: 0, total: 0, totalDays: 0, daysCount: 0, stage: r['ed.stage'] || 'N/A', segment: r['customer-segment'] || 'N/A', arr: r['contracted_arr'] || 0 };
                 }
-                enterpriseStats[enterprise].total++;
+                enterpriseStats[ent].total++;
                 const days = parseFloat(r['days_betweem_latest_image_and-image_qc_done'] || 0);
-                if (days > 0) {
-                    enterpriseStats[enterprise].totalDays += days;
-                    enterpriseStats[enterprise].daysCount++;
-                }
-                if ((r['latest_image_added_on'] || '').includes(today)) {
-                    enterpriseStats[enterprise].today++;
-                }
+                if (days > 0) { enterpriseStats[ent].totalDays += days; enterpriseStats[ent].daysCount++; }
+                if (String(r['latest_image_added_on'] || '').includes(today)) { enterpriseStats[ent].today++; }
             });
 
             const enterpriseRows = Object.entries(enterpriseStats)
                 .sort((a, b) => b[1].today - a[1].today)
                 .map(([name, stats]) => {
                     const avgDays = stats.daysCount > 0 ? (stats.totalDays / stats.daysCount).toFixed(1) : '0';
-                    const arrFormatted = stats.arr ? `$${(stats.arr / 1000).toFixed(0)}K` : 'N/A';
-                    
-                    return `
-                        <tr>
-                            <td><strong>${name}</strong></td>
-                            <td><span class="badge badge-primary">${stats.stage}</span></td>
-                            <td><span class="badge badge-danger">${stats.today}</span></td>
-                            <td>${stats.total}</td>
-                            <td>${avgDays} days</td>
-                            <td>${arrFormatted}</td>
-                            <td><span class="badge badge-info">${stats.segment}</span></td>
-                        </tr>
-                    `;
+                    const arr = stats.arr ? `$${(stats.arr / 1000).toFixed(0)}K` : 'N/A';
+                    return `<tr>
+                        <td><strong>${name}</strong></td>
+                        <td><span class="badge badge-info">${stats.stage}</span></td>
+                        <td><span class="badge badge-danger">${stats.today}</span></td>
+                        <td>${stats.total}</td>
+                        <td>${avgDays} days</td>
+                        <td>${arr}</td>
+                        <td><span class="badge badge-success">${stats.segment}</span></td>
+                    </tr>`;
                 }).join('');
 
-            document.getElementById('enterpriseTable').innerHTML = enterpriseRows || '<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">No data</td></tr>';
-        }
+            document.getElementById('enterpriseTable').innerHTML = enterpriseRows || '<tr><td colspan="7" style="text-align: center;">No data</td></tr>';
 
-        function updatePocTable() {
-            const rows = dashboardData.rows;
-            const today = new Date().toISOString().split('T')[0];
-
+            // CS POC table
             const pocStats = {};
             rows.forEach(r => {
                 const email = r['cs_poc_email'] || 'Unknown';
-                const enterprise = r['enterprise_name'] || 'N/A';
-                
+                const ent = r['enterprise_name'] || 'N/A';
                 if (!pocStats[email]) {
-                    pocStats[email] = {
-                        today: 0,
-                        total: 0,
-                        totalImages: 0,
-                        totalDays: 0,
-                        daysCount: 0,
-                        enterprise: enterprise
-                    };
+                    pocStats[email] = { today: 0, total: 0, totalDays: 0, daysCount: 0, ent: ent };
                 }
                 pocStats[email].total++;
-                pocStats[email].totalImages += parseFloat(r['distinct_image_count'] || 0);
-                
                 const days = parseFloat(r['days_betweem_latest_image_and-image_qc_done'] || 0);
-                if (days > 0) {
-                    pocStats[email].totalDays += days;
-                    pocStats[email].daysCount++;
-                }
-                
-                if ((r['latest_image_added_on'] || '').includes(today)) {
-                    pocStats[email].today++;
-                }
+                if (days > 0) { pocStats[email].totalDays += days; pocStats[email].daysCount++; }
+                if (String(r['latest_image_added_on'] || '').includes(today)) { pocStats[email].today++; }
             });
 
             const pocRows = Object.entries(pocStats)
                 .sort((a, b) => b[1].today - a[1].today)
                 .slice(0, 15)
                 .map(([email, stats]) => {
-                    const avgImages = (stats.totalImages / stats.total).toFixed(1);
                     const avgDays = stats.daysCount > 0 ? (stats.totalDays / stats.daysCount).toFixed(1) : '0';
-                    const reprocessRate = ((stats.today / stats.total) * 100).toFixed(1);
-                    
-                    return `
-                        <tr>
-                            <td><strong>${email}</strong></td>
-                            <td>${stats.enterprise}</td>
-                            <td><span class="badge badge-danger">${stats.today}</span></td>
-                            <td>${stats.total}</td>
-                            <td>${avgImages}</td>
-                            <td>${avgDays} days</td>
-                            <td><span class="badge badge-warning">${reprocessRate}%</span></td>
-                        </tr>
-                    `;
+                    const rate = ((stats.today / stats.total) * 100).toFixed(1);
+                    return `<tr>
+                        <td>${email}</td>
+                        <td>${stats.ent}</td>
+                        <td><span class="badge badge-danger">${stats.today}</span></td>
+                        <td>${stats.total}</td>
+                        <td>${avgDays} days</td>
+                        <td><span class="badge badge-warning">${rate}%</span></td>
+                    </tr>`;
                 }).join('');
 
-            document.getElementById('pocTable').innerHTML = pocRows || '<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">No data</td></tr>';
-        }
+            document.getElementById('pocTable').innerHTML = pocRows || '<tr><td colspan="6" style="text-align: center;">No data</td></tr>';
 
-        function updateObTable() {
-            const rows = dashboardData.rows;
-            const today = new Date().toISOString().split('T')[0];
-
+            // OB POC table
             const obStats = {};
             rows.forEach(r => {
                 const email = r['ob_poc_email'] || 'Unknown';
-                const enterprise = r['enterprise_name'] || 'N/A';
-                
+                const ent = r['enterprise_name'] || 'N/A';
                 if (!obStats[email]) {
-                    obStats[email] = {
-                        today: 0,
-                        total: 0,
-                        enterprise: enterprise
-                    };
+                    obStats[email] = { today: 0, total: 0, ent: ent };
                 }
                 obStats[email].total++;
-                
-                if ((r['latest_image_added_on'] || '').includes(today)) {
-                    obStats[email].today++;
-                }
+                if (String(r['latest_image_added_on'] || '').includes(today)) { obStats[email].today++; }
             });
 
             const obRows = Object.entries(obStats)
                 .sort((a, b) => b[1].today - a[1].today)
                 .slice(0, 15)
                 .map(([email, stats]) => {
-                    const reprocessRate = ((stats.today / stats.total) * 100).toFixed(1);
-                    
-                    return `
-                        <tr>
-                            <td><strong>${email}</strong></td>
-                            <td>${stats.enterprise}</td>
-                            <td><span class="badge badge-danger">${stats.today}</span></td>
-                            <td>${stats.total}</td>
-                            <td><span class="badge badge-warning">${reprocessRate}%</span></td>
-                        </tr>
-                    `;
+                    const rate = ((stats.today / stats.total) * 100).toFixed(1);
+                    return `<tr>
+                        <td>${email}</td>
+                        <td>${stats.ent}</td>
+                        <td><span class="badge badge-danger">${stats.today}</span></td>
+                        <td>${stats.total}</td>
+                        <td><span class="badge badge-warning">${rate}%</span></td>
+                    </tr>`;
                 }).join('');
 
-            document.getElementById('obTable').innerHTML = obRows || '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No data</td></tr>';
+            document.getElementById('obTable').innerHTML = obRows || '<tr><td colspan="5" style="text-align: center;">No data</td></tr>';
         }
 
         function updateTimestamp() {
             const now = new Date();
-            const timeString = now.toLocaleTimeString('en-US', { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                second: '2-digit'
-            });
+            const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             document.getElementById('lastUpdate').textContent = `Updated ${timeString}`;
         }
 
-        // Auto-refresh every 5 minutes
-        function setupAutoRefresh() {
-            setInterval(() => {
-                fetchData();
-            }, 5 * 60 * 1000);
-        }
-
-        // Initialize on page load
         window.addEventListener('load', () => {
             fetchData();
-            setupAutoRefresh();
+            setInterval(fetchData, 5 * 60 * 1000);
         });
     </script>
 </body>
