@@ -298,7 +298,7 @@
             margin-bottom: 20px;
             font-size: 14px;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 10px;
         }
 
@@ -312,6 +312,12 @@
             background: rgba(16, 185, 129, 0.1);
             color: var(--color-emerald);
             border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .message.info {
+            background: rgba(167, 139, 250, 0.1);
+            color: var(--color-purple);
+            border: 1px solid rgba(167, 139, 250, 0.3);
         }
 
         .footer {
@@ -499,31 +505,85 @@
             }
             messageArea.innerHTML = `<div class="message ${type}">${content}</div>`;
             if (type !== 'loading') {
-                setTimeout(() => { messageArea.innerHTML = ''; }, 5000);
+                setTimeout(() => { messageArea.innerHTML = ''; }, 10000);
+            }
+        }
+
+        async function fetchWithRetry(url, options = {}) {
+            const maxRetries = 3;
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 10000);
+                    
+                    const response = await fetch(url, {
+                        ...options,
+                        signal: controller.signal
+                    });
+                    
+                    clearTimeout(timeoutId);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    
+                    return await response.json();
+                } catch (error) {
+                    if (i === maxRetries - 1) throw error;
+                    await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+                }
             }
         }
 
         async function fetchData() {
-            showMessage('Fetching data from Metabase...', 'loading');
+            showMessage('Fetching data from Metabase... (Attempt 1/3)', 'loading');
             try {
-                const apiUrl = `${METABASE_URL}/api/public/card/${QUESTION_ID}/query/json`;
-                const response = await fetch(apiUrl);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                // Try direct fetch first
+                const directUrl = `${METABASE_URL}/api/public/card/${QUESTION_ID}/query/json`;
+                console.log('Attempting direct fetch from:', directUrl);
                 
-                const data = await response.json();
+                const data = await fetchWithRetry(directUrl);
+                console.log('✅ Direct fetch successful');
                 dashboardData.rows = processMetabaseData(data);
                 dashboardData.lastUpdate = new Date();
                 
                 if (dashboardData.rows.length === 0) {
-                    showMessage('❌ No data received from Metabase', 'error');
+                    showMessage('⚠️ No data in Metabase response', 'error');
                     return;
                 }
                 
                 showMessage(`✅ Data loaded successfully! (${dashboardData.rows.length} SKUs)`, 'success');
                 updateDashboard();
-            } catch (error) {
-                console.error('Error:', error);
-                showMessage(`❌ Error: ${error.message}`, 'error');
+            } catch (directError) {
+                console.warn('Direct fetch failed:', directError);
+                showMessage('Direct fetch failed, trying CORS proxy...', 'info');
+                
+                try {
+                    // Try CORS proxy
+                    const corsUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(`${METABASE_URL}/api/public/card/${QUESTION_ID}/query/json`)}`;
+                    console.log('Attempting CORS proxy fetch');
+                    
+                    const data = await fetchWithRetry(corsUrl);
+                    console.log('✅ CORS proxy fetch successful');
+                    dashboardData.rows = processMetabaseData(data);
+                    dashboardData.lastUpdate = new Date();
+                    
+                    if (dashboardData.rows.length === 0) {
+                        showMessage('⚠️ No data in Metabase response', 'error');
+                        return;
+                    }
+                    
+                    showMessage(`✅ Data loaded successfully via proxy! (${dashboardData.rows.length} SKUs)`, 'success');
+                    updateDashboard();
+                } catch (corsError) {
+                    console.error('All fetch methods failed:', corsError);
+                    showMessage(
+                        `❌ Could not load data: ${corsError.message}. ` +
+                        `Check if Metabase is accessible and the Question ID is correct. ` +
+                        `Open browser console (F12) for details.`,
+                        'error'
+                    );
+                }
             }
         }
 
@@ -780,6 +840,7 @@
         }
 
         window.addEventListener('load', () => {
+            console.log('Dashboard loaded. Starting data fetch...');
             fetchData();
             setInterval(fetchData, 5 * 60 * 1000);
         });
