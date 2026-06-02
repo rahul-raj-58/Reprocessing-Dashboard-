@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SKU Reprocessing Monitor</title>
+    <title>SKU Reprocessing Monitor - Advanced Analytics</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
@@ -29,10 +29,7 @@
             --color-red: #ef4444;
         }
 
-        html {
-            scroll-behavior: smooth;
-        }
-
+        html { scroll-behavior: smooth; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(135deg, #0a0e17 0%, #141b2f 100%);
@@ -41,11 +38,7 @@
             line-height: 1.6;
         }
 
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: 24px;
-        }
+        .container { max-width: 1800px; margin: 0 auto; padding: 24px; }
 
         header {
             margin-bottom: 32px;
@@ -63,9 +56,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            display: flex;
-            align-items: center;
-            gap: 12px;
         }
 
         .status-badge {
@@ -88,10 +78,7 @@
             animation: pulse 2s infinite;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
         .tabs {
             display: flex;
@@ -118,17 +105,8 @@
             border-bottom-color: var(--color-purple);
         }
 
-        .tab-button:hover {
-            color: var(--text-primary);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
         .import-section {
             background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
@@ -139,48 +117,9 @@
             text-align: center;
         }
 
-        .import-section h2 {
-            font-size: 18px;
-            margin-bottom: 16px;
-            color: var(--text-primary);
-        }
-
-        .file-input-wrapper {
-            position: relative;
-            display: inline-block;
-            margin-bottom: 20px;
-        }
-
-        .file-input-wrapper input[type="file"] {
-            position: absolute;
-            left: -9999px;
-        }
-
-        .file-input-label {
-            display: inline-block;
-            padding: 12px 24px;
-            background: linear-gradient(135deg, var(--color-purple), var(--color-pink));
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .file-input-label:hover {
-            opacity: 0.9;
-            transform: scale(1.05);
-        }
-
-        .file-name {
-            margin-top: 12px;
-            font-size: 13px;
-            color: var(--color-emerald);
-        }
-
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 16px;
             margin-bottom: 32px;
         }
@@ -190,6 +129,7 @@
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 20px;
+            cursor: pointer;
             position: relative;
             overflow: hidden;
             transition: all 0.3s ease;
@@ -213,9 +153,7 @@
             transition: opacity 0.3s ease;
         }
 
-        .metric-card:hover::before {
-            opacity: 1;
-        }
+        .metric-card:hover::before { opacity: 1; }
 
         .metric-label {
             font-size: 12px;
@@ -233,9 +171,10 @@
             margin-bottom: 4px;
         }
 
-        .metric-change {
+        .metric-subtext {
             font-size: 11px;
             color: var(--text-muted);
+            margin-top: 8px;
         }
 
         .section-title {
@@ -258,7 +197,7 @@
 
         .charts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
             gap: 20px;
             margin-bottom: 32px;
         }
@@ -272,72 +211,7 @@
 
         .chart-wrapper {
             position: relative;
-            height: 300px;
-        }
-
-        .analytics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 32px;
-        }
-
-        .analytics-card {
-            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-        }
-
-        .analytics-card h3 {
-            font-size: 16px;
-            margin-bottom: 16px;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .analytics-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(167, 139, 250, 0.1);
-            font-size: 13px;
-        }
-
-        .analytics-item:last-child {
-            border-bottom: none;
-        }
-
-        .analytics-label {
-            color: var(--text-secondary);
-        }
-
-        .analytics-value {
-            font-weight: 600;
-            color: var(--color-purple);
-        }
-
-        .insight-box {
-            background: rgba(16, 185, 129, 0.1);
-            border-left: 3px solid var(--color-emerald);
-            padding: 16px;
-            border-radius: 6px;
-            margin-bottom: 12px;
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .insight-box.warning {
-            background: rgba(249, 115, 22, 0.1);
-            border-left-color: var(--color-orange);
-        }
-
-        .insight-box.danger {
-            background: rgba(239, 68, 68, 0.1);
-            border-left-color: var(--color-red);
+            height: 350px;
         }
 
         .table-container {
@@ -365,11 +239,11 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 13px;
+            overflow-x: auto;
+            display: block;
         }
 
-        thead tr {
-            background: rgba(0, 0, 0, 0.2);
-        }
+        thead tr { background: rgba(0, 0, 0, 0.2); }
 
         th {
             padding: 12px 16px;
@@ -388,9 +262,7 @@
             color: var(--text-primary);
         }
 
-        tbody tr:hover {
-            background: rgba(167, 139, 250, 0.08);
-        }
+        tbody tr:hover { background: rgba(167, 139, 250, 0.08); }
 
         .badge {
             display: inline-block;
@@ -398,27 +270,80 @@
             border-radius: 16px;
             font-size: 11px;
             font-weight: 600;
-            white-space: nowrap;
         }
 
-        .badge-success {
-            background: rgba(16, 185, 129, 0.2);
+        .badge-success { background: rgba(16, 185, 129, 0.2); color: var(--color-emerald); }
+        .badge-warning { background: rgba(249, 115, 22, 0.2); color: var(--color-orange); }
+        .badge-danger { background: rgba(239, 68, 68, 0.2); color: var(--color-red); }
+        .badge-info { background: rgba(167, 139, 250, 0.2); color: var(--color-purple); }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            width: 100%;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .file-input-wrapper input[type="file"] { position: absolute; left: -9999px; }
+
+        .file-input-label {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--color-purple), var(--color-pink));
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .file-input-label:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+        .file-name {
+            margin-top: 12px;
+            font-size: 13px;
             color: var(--color-emerald);
-        }
-
-        .badge-warning {
-            background: rgba(249, 115, 22, 0.2);
-            color: var(--color-orange);
-        }
-
-        .badge-danger {
-            background: rgba(239, 68, 68, 0.2);
-            color: var(--color-red);
-        }
-
-        .badge-info {
-            background: rgba(167, 139, 250, 0.2);
-            color: var(--color-purple);
         }
 
         .loading {
@@ -439,9 +364,7 @@
             margin-right: 16px;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         .message {
             padding: 16px 20px;
@@ -453,23 +376,8 @@
             gap: 10px;
         }
 
-        .message.error {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--color-red);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .message.success {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--color-emerald);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .message.info {
-            background: rgba(167, 139, 250, 0.1);
-            color: var(--color-purple);
-            border: 1px solid rgba(167, 139, 250, 0.3);
-        }
+        .message.error { background: rgba(239, 68, 68, 0.1); color: var(--color-red); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .message.success { background: rgba(16, 185, 129, 0.1); color: var(--color-emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
 
         .footer {
             text-align: center;
@@ -480,44 +388,32 @@
             margin-top: 32px;
         }
 
+        .drill-down-table {
+            overflow-x: auto;
+        }
+
+        .drill-down-table table {
+            display: table;
+        }
+
         @media (max-width: 1024px) {
-            .charts-grid,
-            .analytics-grid {
+            .charts-grid {
                 grid-template-columns: 1fr;
             }
         }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 16px;
-            }
-
-            h1 {
-                font-size: 24px;
-            }
-
-            .metrics-grid {
-                grid-template-columns: 1fr;
-            }
-
-            table {
-                font-size: 12px;
-            }
-
-            th, td {
-                padding: 10px 12px;
-            }
-
-            .chart-wrapper {
-                height: 250px;
-            }
+            .container { padding: 16px; }
+            h1 { font-size: 24px; }
+            .metrics-grid { grid-template-columns: 1fr; }
+            .modal-content { padding: 20px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>📊 SKU Reprocessing Monitor & Analytics</h1>
+            <h1>📊 SKU Reprocessing Advanced Analytics</h1>
             <div class="status-badge">
                 <span class="status-dot"></span>
                 <span id="lastUpdate">Ready</span>
@@ -527,96 +423,159 @@
         <div class="tabs">
             <button class="tab-button active" onclick="switchTab('dashboard')">📊 Dashboard</button>
             <button class="tab-button" onclick="switchTab('import')">📁 Import Data</button>
-            <button class="tab-button" onclick="switchTab('analytics')">📈 Analytics</button>
         </div>
 
         <div id="messageArea"></div>
 
         <!-- DASHBOARD TAB -->
         <div id="dashboard" class="tab-content active">
+            <!-- Metric Cards with Drill-Down -->
             <div class="metrics-grid" id="metricsGrid">
-                <div class="metric-card">
+                <div class="metric-card" onclick="showDrillDown('totalSkus')">
                     <div class="metric-label">Total SKUs</div>
                     <div class="metric-value" id="totalSkus">-</div>
+                    <div class="metric-subtext">Click for details</div>
                 </div>
-                <div class="metric-card">
+                <div class="metric-card" onclick="showDrillDown('reprocessedToday')">
                     <div class="metric-label">Reprocessed Today</div>
                     <div class="metric-value" id="reprocessedToday">-</div>
+                    <div class="metric-subtext">Click for details</div>
                 </div>
-                <div class="metric-card">
+                <div class="metric-card" onclick="showDrillDown('reprocessedWith7d')">
+                    <div class="metric-label">Reprocessed (7 Days)</div>
+                    <div class="metric-value" id="reprocessedWith7d">-</div>
+                    <div class="metric-subtext">Click for details</div>
+                </div>
+                <div class="metric-card" onclick="showDrillDown('reprocessedWith30d')">
+                    <div class="metric-label">Reprocessed (30 Days)</div>
+                    <div class="metric-value" id="reprocessedWith30d">-</div>
+                    <div class="metric-subtext">Click for details</div>
+                </div>
+                <div class="metric-card" onclick="showDrillDown('avgQcTime')">
                     <div class="metric-label">Avg Days to QC</div>
-                    <div class="metric-value" id="avgDaysQc">-</div>
+                    <div class="metric-value" id="avgQcTime">-</div>
+                    <div class="metric-subtext">Click for details</div>
                 </div>
-                <div class="metric-card">
-                    <div class="metric-label">Active Enterprises</div>
-                    <div class="metric-value" id="activeEnterprises">-</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-label">Active CS POCs</div>
-                    <div class="metric-value" id="activePocs">-</div>
-                </div>
-                <div class="metric-card">
+                <div class="metric-card" onclick="showDrillDown('qcCompletion')">
                     <div class="metric-label">QC Completion Rate</div>
-                    <div class="metric-value" id="qcRate">-</div>
+                    <div class="metric-value" id="qcCompletion">-</div>
+                    <div class="metric-subtext">Click for details</div>
                 </div>
             </div>
 
+            <!-- Daily Reprocessing Trend -->
+            <h2 class="section-title">📈 Daily Reprocessing Trend</h2>
             <div class="charts-grid">
                 <div class="chart-container">
-                    <h3 class="section-title" style="margin-bottom: 16px;">Daily Reprocessing Trend</h3>
                     <div class="chart-wrapper">
-                        <canvas id="trendChart"></canvas>
+                        <canvas id="dailyTrendChart"></canvas>
                     </div>
                 </div>
                 <div class="chart-container">
-                    <h3 class="section-title" style="margin-bottom: 16px;">QC Status Distribution</h3>
                     <div class="chart-wrapper">
-                        <canvas id="qcChart"></canvas>
+                        <canvas id="reprocessingVolumeChart"></canvas>
                     </div>
                 </div>
             </div>
 
+            <!-- Top Enterprises by Reprocessing -->
+            <h2 class="section-title">🏢 Top Enterprises by Reprocessing Volume</h2>
             <div class="table-container">
                 <div class="table-header">
-                    <h3>Top Enterprises by Daily Reprocessing</h3>
+                    <h3>Enterprise Reprocessing Metrics</h3>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Enterprise Name</th>
-                            <th>Stage</th>
-                            <th>Today</th>
-                            <th>Total</th>
-                            <th>Avg Days QC</th>
-                            <th>ARR</th>
-                            <th>Segment</th>
-                        </tr>
-                    </thead>
-                    <tbody id="enterpriseTable">
-                        <tr><td colspan="7" style="text-align: center; padding: 40px;">Click "Import Data" to load CSV</td></tr>
-                    </tbody>
-                </table>
+                <div class="drill-down-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Enterprise Name</th>
+                                <th>Total SKUs</th>
+                                <th>Reprocessed</th>
+                                <th>Reprocess %</th>
+                                <th>Customer Segment</th>
+                                <th>Stage</th>
+                                <th>Today Count</th>
+                            </tr>
+                        </thead>
+                        <tbody id="enterpriseReprocessTable"></tbody>
+                    </table>
+                </div>
             </div>
 
+            <!-- CS POC Reprocessing -->
+            <h2 class="section-title">👤 CS POC Reprocessing Metrics</h2>
             <div class="table-container">
                 <div class="table-header">
-                    <h3>CS POC Performance Metrics</h3>
+                    <h3>Customer Success POC Performance</h3>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>CS POC Email</th>
-                            <th>Enterprise</th>
-                            <th>Today</th>
-                            <th>Total</th>
-                            <th>Avg Days</th>
-                            <th>Rate</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pocTable">
-                        <tr><td colspan="6" style="text-align: center; padding: 40px;">Click "Import Data" to load CSV</td></tr>
-                    </tbody>
-                </table>
+                <div class="drill-down-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>CS POC Email</th>
+                                <th>Total SKUs</th>
+                                <th>Reprocessed</th>
+                                <th>Reprocess %</th>
+                                <th>Enterprise Count</th>
+                                <th>Today Count</th>
+                                <th>Avg QC Days</th>
+                            </tr>
+                        </thead>
+                        <tbody id="csPocTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- OB POC Reprocessing -->
+            <h2 class="section-title">🚀 OB POC Reprocessing Metrics</h2>
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>Onboarding POC Performance</h3>
+                </div>
+                <div class="drill-down-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>OB POC Email</th>
+                                <th>Total SKUs</th>
+                                <th>Reprocessed</th>
+                                <th>Reprocess %</th>
+                                <th>Enterprise Count</th>
+                                <th>Today Count</th>
+                            </tr>
+                        </thead>
+                        <tbody id="obPocTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Customer Segment Analysis -->
+            <h2 class="section-title">📊 Reprocessing by Customer Segment</h2>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <div class="chart-wrapper">
+                        <canvas id="segmentChart"></canvas>
+                    </div>
+                </div>
+                <div class="table-container" style="grid-column: 1;">
+                    <div class="table-header">
+                        <h3>Segment Breakdown</h3>
+                    </div>
+                    <div class="drill-down-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Customer Segment</th>
+                                    <th>Total SKUs</th>
+                                    <th>Reprocessed</th>
+                                    <th>Reprocess %</th>
+                                    <th>Today Count</th>
+                                </tr>
+                            </thead>
+                            <tbody id="segmentTable"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -625,7 +584,7 @@
             <div class="import-section">
                 <h2>📁 Import CSV Data</h2>
                 <p style="color: var(--text-secondary); margin-bottom: 24px;">
-                    Upload a CSV file to analyze your SKU reprocessing data
+                    Upload a CSV file with your SKU reprocessing data including the new qc_done_after_latest_image_times_json column
                 </p>
 
                 <div class="file-input-wrapper">
@@ -636,11 +595,12 @@
                 <div id="fileName"></div>
 
                 <div style="margin-top: 24px; color: var(--text-secondary); font-size: 13px;">
-                    <p><strong>Expected CSV Columns:</strong></p>
+                    <p><strong>Required CSV Columns:</strong></p>
                     <p style="margin-top: 8px;">
-                        sb.sku_id, sku_created_on, latest_image_added_on, distinct_image_count, 
-                        qc_done_count, enterprise_name, ed.stage, cs_poc_email, ob_poc_email, 
-                        contracted_arr, customer-segment, days_betweem_latest_image_and-image_qc_done
+                        sb.sku_id, latest_image_added_on, qc_done_count, enterprise_name, 
+                        cs_poc_email, ob_poc_email, customer-segment, ed.stage,
+                        days_betweem_latest_image_and-image_qc_done, contracted_arr,
+                        <strong style="color: var(--color-purple);">qc_done_after_latest_image_times_json</strong>
                     </p>
                 </div>
 
@@ -650,154 +610,17 @@
             </div>
         </div>
 
-        <!-- ANALYTICS TAB -->
-        <div id="analytics" class="tab-content">
-            <div id="analyticsContent" style="display: none;">
-                <div class="analytics-grid">
-                    <div class="analytics-card">
-                        <h3>📊 Data Summary</h3>
-                        <div class="analytics-item">
-                            <span class="analytics-label">Total Records</span>
-                            <span class="analytics-value" id="analTotalRecords">-</span>
-                        </div>
-                        <div class="analytics-item">
-                            <span class="analytics-label">Date Range</span>
-                            <span class="analytics-value" id="analDateRange">-</span>
-                        </div>
-                        <div class="analytics-item">
-                            <span class="analytics-label">Total Enterprises</span>
-                            <span class="analytics-value" id="analEnterprises">-</span>
-                        </div>
-                        <div class="analytics-item">
-                            <span class="analytics-label">Total POCs</span>
-                            <span class="analytics-value" id="analPocs">-</span>
-                        </div>
-                        <div class="analytics-item">
-                            <span class="analytics-label">Total Revenue (ARR)</span>
-                            <span class="analytics-value" id="analRevenue">-</span>
-                        </div>
-                    </div>
-
-                    <div class="analytics-card">
-                        <h3>🎯 Reprocessing Metrics</h3>
-                        <div class="analytics-item">
-                            <span class="analytics-label">Avg Images/SKU</span>
-                            <span class="analytics-value" id="analAvgImages">-</span>
-                        </div>
-                        <div class="analytics-item">
-                            <span class="analytics-label">SKUs w/ Images Today</span>
-                            <span class="analytics-value" id="analSKUsToday">-</span>
-                        </div>
-                        <div class="analytics-item">
-                            <span class="analytics-label">Daily Avg (7d)</span>
-                            <span class="analytics-value" id="analDailyAvg7d">-</span>
-                        </div>
-                        <div class="analytics-item">
-                            <span class="analytics-label">Daily Avg (30d)</span>
-                            <span class="analytics-value" id="analDailyAvg30d">-</span>
-                        </div>
-                    </div>
-
-                    <div class="analytics-card">
-                        <h3>⏱️ QC Performance</h3>
-                        <div class="analytics-item">
-                            <span class="analytics-label">QC Completion Rate</span>
-                            <span class="analytics-value" id="analQCRate">-</span>
-                        </div>
-                        <div class="analytics-item">
-                            <span class="analytics-label">Avg Days to QC</span>
-                            <span class="analytics-value" id="analQCDays">-</span>
-                        </div>
-                        <div class="analytics-item">
-                            <span class="analytics-label">Median Days to QC</span>
-                            <span class="analytics-value" id="analQCMedian">-</span>
-                        </div>
-                        <div class="analytics-item">
-                            <span class="analytics-label">Max Days to QC</span>
-                            <span class="analytics-value" id="analQCMax">-</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="analytics-grid">
-                    <div class="analytics-card">
-                        <h3>🔴 Key Insights & Recommendations</h3>
-                        <div id="insightsContainer"></div>
-                    </div>
-
-                    <div class="analytics-card">
-                        <h3>👥 Top Performers</h3>
-                        <div id="topPerformersContainer"></div>
-                    </div>
-
-                    <div class="analytics-card">
-                        <h3>⚠️ Areas for Improvement</h3>
-                        <div id="improvementAreasContainer"></div>
-                    </div>
-                </div>
-
-                <div class="charts-grid">
-                    <div class="chart-container">
-                        <h3 class="section-title" style="margin-bottom: 16px;">Enterprise Distribution</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="enterpriseChart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="chart-container">
-                        <h3 class="section-title" style="margin-bottom: 16px;">QC Time Distribution</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="qcTimeChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="table-container">
-                    <div class="table-header">
-                        <h3>Top 15 Enterprises by Total SKUs</h3>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Enterprise</th>
-                                <th>Total SKUs</th>
-                                <th>Stage</th>
-                                <th>Avg QC Days</th>
-                                <th>Total ARR</th>
-                                <th>Reprocess Rate</th>
-                            </tr>
-                        </thead>
-                        <tbody id="analEnterpriseTable"></tbody>
-                    </table>
-                </div>
-
-                <div class="table-container">
-                    <div class="table-header">
-                        <h3>Top 15 CS POCs by SKU Count</h3>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>CS POC Email</th>
-                                <th>Total SKUs</th>
-                                <th>Enterprise Count</th>
-                                <th>Avg QC Days</th>
-                                <th>Today Count</th>
-                                <th>Workload</th>
-                            </tr>
-                        </thead>
-                        <tbody id="analPocTable"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div style="text-align: center; padding: 60px 20px; color: var(--text-secondary);">
-                <p>📊 Import data to see analytics</p>
-            </div>
-        </div>
-
         <div class="footer">
-            <p>SKU Reprocessing Monitor & Analytics • Dark Mode Dashboard</p>
+            <p>SKU Reprocessing Advanced Analytics • Real-time Monitoring & Insights</p>
+        </div>
+    </div>
+
+    <!-- Drill-Down Modal -->
+    <div id="drillDownModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeDrillDown()">&times;</button>
+            <h2 id="drillDownTitle" style="margin-bottom: 20px;"></h2>
+            <div id="drillDownContent"></div>
         </div>
     </div>
 
@@ -849,13 +672,11 @@
                         
                         showMessage(`✅ Data imported successfully! (${results.data.length} SKUs)`, 'success');
                         updateDashboard();
-                        updateAnalytics();
                         
-                        // Switch to dashboard
                         setTimeout(() => {
                             document.getElementById('dashboard').classList.add('active');
                             document.getElementById('import').classList.remove('active');
-                            document.querySelector('.tab-button').classList.add('active');
+                            document.querySelectorAll('.tab-button')[0].classList.add('active');
                             document.querySelectorAll('.tab-button')[1].classList.remove('active');
                         }, 500);
                     },
@@ -888,13 +709,11 @@
                         
                         showMessage(`✅ Data loaded from Metabase! (${results.data.length} SKUs)`, 'success');
                         updateDashboard();
-                        updateAnalytics();
                         
-                        // Switch to dashboard
                         setTimeout(() => {
                             document.getElementById('dashboard').classList.add('active');
                             document.getElementById('import').classList.remove('active');
-                            document.querySelector('.tab-button').classList.add('active');
+                            document.querySelectorAll('.tab-button')[0].classList.add('active');
                             document.querySelectorAll('.tab-button')[1].classList.remove('active');
                         }, 500);
                     },
@@ -908,42 +727,59 @@
         }
 
         function updateDashboard() {
-            const rows = dashboardData.rows;
-            if (rows.length === 0) return;
+            updateMetrics();
+            updateCharts();
+            updateTables();
+        }
 
+        function updateMetrics() {
+            const rows = dashboardData.rows;
             const today = new Date().toISOString().split('T')[0];
 
+            // Total SKUs
             document.getElementById('totalSkus').textContent = rows.length.toLocaleString();
 
+            // Reprocessed today (SKUs with latest_image_added_on = today)
             const reprocessedToday = rows.filter(r => String(r['latest_image_added_on'] || '').includes(today)).length;
             document.getElementById('reprocessedToday').textContent = reprocessedToday;
 
+            // Reprocessed 7 days
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+            const reprocessed7d = rows.filter(r => {
+                const d = new Date(r['latest_image_added_on']);
+                return d >= sevenDaysAgo;
+            }).length;
+            document.getElementById('reprocessedWith7d').textContent = reprocessed7d;
+
+            // Reprocessed 30 days
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            const reprocessed30d = rows.filter(r => {
+                const d = new Date(r['latest_image_added_on']);
+                return d >= thirtyDaysAgo;
+            }).length;
+            document.getElementById('reprocessedWith30d').textContent = reprocessed30d;
+
+            // Avg QC time
             let totalDays = 0, count = 0;
             rows.forEach(r => {
                 const days = parseFloat(r['days_betweem_latest_image_and-image_qc_done'] || 0);
                 if (days > 0) { totalDays += days; count++; }
             });
             const avgDays = count > 0 ? (totalDays / count).toFixed(1) : '0';
-            document.getElementById('avgDaysQc').textContent = avgDays;
+            document.getElementById('avgQcTime').textContent = avgDays;
 
-            const enterprises = new Set(rows.map(r => r['enterprise_name']).filter(x => x)).size;
-            document.getElementById('activeEnterprises').textContent = enterprises;
-
-            const pocs = new Set(rows.filter(r => r['cs_poc_email']).map(r => r['cs_poc_email']).filter(x => x)).size;
-            document.getElementById('activePocs').textContent = pocs;
-
+            // QC Completion
             const qcCompleted = rows.filter(r => r['qc_done_count'] > 0).length;
-            const qcRate = rows.length > 0 ? ((qcCompleted / rows.length) * 100).toFixed(1) : '0';
-            document.getElementById('qcRate').textContent = qcRate + '%';
-
-            updateCharts();
-            updateTables();
+            const qcRate = ((qcCompleted / rows.length) * 100).toFixed(1);
+            document.getElementById('qcCompletion').textContent = qcRate + '%';
         }
 
         function updateCharts() {
             const rows = dashboardData.rows;
 
-            // Trend chart
+            // Daily trend
             const dailyData = {};
             rows.forEach(r => {
                 const dateStr = String(r['latest_image_added_on'] || '');
@@ -955,7 +791,7 @@
             const trendValues = sortedDates.map(d => dailyData[d]);
 
             if (chartInstances.trend) chartInstances.trend.destroy();
-            chartInstances.trend = new Chart(document.getElementById('trendChart'), {
+            chartInstances.trend = new Chart(document.getElementById('dailyTrendChart'), {
                 type: 'line',
                 data: {
                     labels: sortedDates.map(d => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
@@ -968,326 +804,29 @@
                         tension: 0.4,
                         fill: true,
                         pointRadius: 4,
-                        pointBackgroundColor: '#a78bfa',
-                        pointBorderColor: '#0a0e17',
-                        pointBorderWidth: 2
+                        pointBackgroundColor: '#a78bfa'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: '#a0a9b8', usePointStyle: true, padding: 20, font: { size: 12 } } } },
+                    plugins: { legend: { labels: { color: '#a0a9b8', usePointStyle: true, padding: 20 } } },
                     scales: {
-                        y: { beginAtZero: true, grid: { color: 'rgba(167, 139, 250, 0.1)', drawBorder: false }, ticks: { color: '#a0a9b8' } },
-                        x: { grid: { display: false, drawBorder: false }, ticks: { color: '#a0a9b8' } }
+                        y: { beginAtZero: true, grid: { color: 'rgba(167, 139, 250, 0.1)' }, ticks: { color: '#a0a9b8' } },
+                        x: { ticks: { color: '#a0a9b8' } }
                     }
                 }
             });
 
-            // QC chart
-            const qcCompleted = rows.filter(r => r['qc_done_count'] > 0).length;
-            const qcPending = rows.filter(r => r['qc_done_count'] === 0).length;
-
-            if (chartInstances.qc) chartInstances.qc.destroy();
-            chartInstances.qc = new Chart(document.getElementById('qcChart'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['QC Completed', 'Pending QC'],
-                    datasets: [{
-                        data: [qcCompleted, qcPending],
-                        backgroundColor: ['#10b981', '#f472b6'],
-                        borderColor: '#141b2f',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom', labels: { color: '#a0a9b8', usePointStyle: true, padding: 20, font: { size: 12 } } } }
-                }
-            });
-        }
-
-        function updateTables() {
-            const rows = dashboardData.rows;
-            const today = new Date().toISOString().split('T')[0];
-
-            // Enterprise table
-            const enterpriseStats = {};
-            rows.forEach(r => {
-                const ent = r['enterprise_name'] || 'Unknown';
-                if (!enterpriseStats[ent]) {
-                    enterpriseStats[ent] = { today: 0, total: 0, totalDays: 0, daysCount: 0, stage: r['ed.stage'] || 'N/A', segment: r['customer-segment'] || 'N/A', arr: r['contracted_arr'] || 0 };
-                }
-                enterpriseStats[ent].total++;
-                const days = parseFloat(r['days_betweem_latest_image_and-image_qc_done'] || 0);
-                if (days > 0) { enterpriseStats[ent].totalDays += days; enterpriseStats[ent].daysCount++; }
-                if (String(r['latest_image_added_on'] || '').includes(today)) { enterpriseStats[ent].today++; }
-            });
-
-            const enterpriseRows = Object.entries(enterpriseStats)
-                .sort((a, b) => b[1].today - a[1].today)
-                .map(([name, stats]) => {
-                    const avgDays = stats.daysCount > 0 ? (stats.totalDays / stats.daysCount).toFixed(1) : '0';
-                    const arr = stats.arr ? `$${(parseFloat(stats.arr) / 1000).toFixed(0)}K` : 'N/A';
-                    return `<tr>
-                        <td><strong>${name}</strong></td>
-                        <td><span class="badge badge-info">${stats.stage}</span></td>
-                        <td><span class="badge badge-danger">${stats.today}</span></td>
-                        <td>${stats.total}</td>
-                        <td>${avgDays} days</td>
-                        <td>${arr}</td>
-                        <td><span class="badge badge-success">${stats.segment}</span></td>
-                    </tr>`;
-                }).join('');
-
-            document.getElementById('enterpriseTable').innerHTML = enterpriseRows || '<tr><td colspan="7" style="text-align: center;">No data</td></tr>';
-
-            // POC table
-            const pocStats = {};
-            rows.forEach(r => {
-                const email = r['cs_poc_email'] || 'Unknown';
-                const ent = r['enterprise_name'] || 'N/A';
-                if (!pocStats[email]) {
-                    pocStats[email] = { today: 0, total: 0, totalDays: 0, daysCount: 0, ent: ent };
-                }
-                pocStats[email].total++;
-                const days = parseFloat(r['days_betweem_latest_image_and-image_qc_done'] || 0);
-                if (days > 0) { pocStats[email].totalDays += days; pocStats[email].daysCount++; }
-                if (String(r['latest_image_added_on'] || '').includes(today)) { pocStats[email].today++; }
-            });
-
-            const pocRows = Object.entries(pocStats)
-                .sort((a, b) => b[1].today - a[1].today)
-                .slice(0, 15)
-                .map(([email, stats]) => {
-                    const avgDays = stats.daysCount > 0 ? (stats.totalDays / stats.daysCount).toFixed(1) : '0';
-                    const rate = stats.total > 0 ? ((stats.today / stats.total) * 100).toFixed(1) : '0';
-                    return `<tr>
-                        <td>${email}</td>
-                        <td>${stats.ent}</td>
-                        <td><span class="badge badge-danger">${stats.today}</span></td>
-                        <td>${stats.total}</td>
-                        <td>${avgDays} days</td>
-                        <td><span class="badge badge-warning">${rate}%</span></td>
-                    </tr>`;
-                }).join('');
-
-            document.getElementById('pocTable').innerHTML = pocRows || '<tr><td colspan="6" style="text-align: center;">No data</td></tr>';
-        }
-
-        function updateAnalytics() {
-            const rows = dashboardData.rows;
-            if (rows.length === 0) return;
-
-            document.getElementById('analyticsContent').style.display = 'block';
-            document.querySelector('.tab-content:last-of-type').innerHTML = document.getElementById('analyticsContent').outerHTML;
-
-            // Update summary
-            const dates = rows.map(r => r['sku_created_on']).filter(d => d).sort();
-            const dateRange = dates.length > 0 ? `${dates[0]} to ${dates[dates.length - 1]}` : 'N/A';
-            
-            const enterprises = new Set(rows.map(r => r['enterprise_name']).filter(x => x)).size;
-            const pocs = new Set(rows.filter(r => r['cs_poc_email']).map(r => r['cs_poc_email']).filter(x => x)).size;
-            const totalARR = rows.reduce((sum, r) => sum + (parseFloat(r['contracted_arr']) || 0), 0);
-
-            document.getElementById('analTotalRecords').textContent = rows.length.toLocaleString();
-            document.getElementById('analDateRange').textContent = dateRange;
-            document.getElementById('analEnterprises').textContent = enterprises;
-            document.getElementById('analPocs').textContent = pocs;
-            document.getElementById('analRevenue').textContent = `$${(totalARR / 1000000).toFixed(1)}M`;
-
-            // Reprocessing metrics
-            const avgImages = (rows.reduce((sum, r) => sum + (parseFloat(r['distinct_image_count']) || 0), 0) / rows.length).toFixed(2);
-            const today = new Date().toISOString().split('T')[0];
-            const skusToday = rows.filter(r => String(r['latest_image_added_on'] || '').includes(today)).length;
-            
-            const sevenDaysAgo = new Date();
-            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-            const skus7d = rows.filter(r => {
-                const d = new Date(r['latest_image_added_on']);
-                return d >= sevenDaysAgo;
-            }).length;
-
-            const thirtyDaysAgo = new Date();
-            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-            const skus30d = rows.filter(r => {
-                const d = new Date(r['latest_image_added_on']);
-                return d >= thirtyDaysAgo;
-            }).length;
-
-            document.getElementById('analAvgImages').textContent = avgImages;
-            document.getElementById('analSKUsToday').textContent = skusToday;
-            document.getElementById('analDailyAvg7d').textContent = (skus7d / 7).toFixed(1);
-            document.getElementById('analDailyAvg30d').textContent = (skus30d / 30).toFixed(1);
-
-            // QC metrics
-            const qcCompleted = rows.filter(r => r['qc_done_count'] > 0).length;
-            const qcRate = ((qcCompleted / rows.length) * 100).toFixed(1);
-            const days = rows.map(r => parseFloat(r['days_betweem_latest_image_and-image_qc_done']) || 0).filter(d => d > 0);
-            const avgDays = days.length > 0 ? (days.reduce((a, b) => a + b) / days.length).toFixed(2) : 'N/A';
-            const medianDays = days.length > 0 ? days.sort((a, b) => a - b)[Math.floor(days.length / 2)].toFixed(2) : 'N/A';
-            const maxDays = days.length > 0 ? Math.max(...days).toFixed(2) : 'N/A';
-
-            document.getElementById('analQCRate').textContent = qcRate + '%';
-            document.getElementById('analQCDays').textContent = avgDays;
-            document.getElementById('analQCMedian').textContent = medianDays;
-            document.getElementById('analQCMax').textContent = maxDays;
-
-            // Generate insights
-            generateInsights();
-            generateTopPerformers();
-            generateImprovementAreas();
-            updateAnalyticsCharts();
-            updateAnalyticsTables();
-        }
-
-        function generateInsights() {
-            const rows = dashboardData.rows;
-            const insights = [];
-
-            const qcRate = ((rows.filter(r => r['qc_done_count'] > 0).length / rows.length) * 100);
-            if (qcRate > 85) {
-                insights.push({ type: 'success', text: '✅ Excellent QC completion rate (' + qcRate.toFixed(1) + '%). Keep up the good work!' });
-            } else if (qcRate < 70) {
-                insights.push({ type: 'danger', text: '⚠️ Low QC completion rate (' + qcRate.toFixed(1) + '%). Consider allocating more resources.' });
-            }
-
-            const avgQCDays = rows.reduce((sum, r) => sum + (parseFloat(r['days_betweem_latest_image_and-image_qc_done']) || 0), 0) / rows.length;
-            if (avgQCDays < 3) {
-                insights.push({ type: 'success', text: '✅ Fast QC processing (' + avgQCDays.toFixed(1) + ' days avg). Efficient operations.' });
-            } else if (avgQCDays > 5) {
-                insights.push({ type: 'warning', text: '⚠️ Slow QC processing (' + avgQCDays.toFixed(1) + ' days avg). Review bottlenecks.' });
-            }
-
-            const today = new Date().toISOString().split('T')[0];
-            const dailyReprocess = rows.filter(r => String(r['latest_image_added_on'] || '').includes(today)).length;
-            if (dailyReprocess > 300) {
-                insights.push({ type: 'warning', text: '⚠️ High daily reprocessing (' + dailyReprocess + ' SKUs). Monitor for issues.' });
-            }
-
-            document.getElementById('insightsContainer').innerHTML = insights.map(i => 
-                `<div class="insight-box ${i.type === 'danger' ? 'danger' : i.type === 'warning' ? 'warning' : ''}">${i.text}</div>`
-            ).join('');
-        }
-
-        function generateTopPerformers() {
-            const rows = dashboardData.rows;
-            const pocStats = {};
-
-            rows.forEach(r => {
-                const email = r['cs_poc_email'];
-                if (!pocStats[email]) {
-                    pocStats[email] = { total: 0, qcCompleted: 0 };
-                }
-                pocStats[email].total++;
-                if (r['qc_done_count'] > 0) pocStats[email].qcCompleted++;
-            });
-
-            const top = Object.entries(pocStats)
-                .map(([email, stats]) => ({
-                    email,
-                    rate: (stats.qcCompleted / stats.total * 100).toFixed(1),
-                    total: stats.total
-                }))
-                .sort((a, b) => b.rate - a.rate)
-                .slice(0, 5);
-
-            document.getElementById('topPerformersContainer').innerHTML = top.map(p => 
-                `<div class="analytics-item">
-                    <span class="analytics-label">${p.email.split('@')[0]}</span>
-                    <span class="analytics-value">${p.rate}% (${p.total} SKUs)</span>
-                </div>`
-            ).join('');
-        }
-
-        function generateImprovementAreas() {
-            const rows = dashboardData.rows;
-            const improvements = [];
-
-            // Find enterprises with low QC rates
-            const entStats = {};
-            rows.forEach(r => {
-                const ent = r['enterprise_name'];
-                if (!entStats[ent]) {
-                    entStats[ent] = { total: 0, qcCompleted: 0 };
-                }
-                entStats[ent].total++;
-                if (r['qc_done_count'] > 0) entStats[ent].qcCompleted++;
-            });
-
-            const lowPerformers = Object.entries(entStats)
-                .map(([ent, stats]) => ({
-                    ent,
-                    rate: (stats.qcCompleted / stats.total * 100)
-                }))
-                .filter(e => e.rate < 70)
-                .sort((a, b) => a.rate - b.rate)
-                .slice(0, 3);
-
-            document.getElementById('improvementAreasContainer').innerHTML = lowPerformers.map(e => 
-                `<div class="insight-box danger">${e.ent}: ${e.rate.toFixed(1)}% QC rate</div>`
-            ).join('') || '<div class="insight-box">All enterprises performing well!</div>';
-        }
-
-        function updateAnalyticsCharts() {
-            const rows = dashboardData.rows;
-
-            // Enterprise distribution
-            const entCounts = {};
-            rows.forEach(r => {
-                const ent = r['enterprise_name'] || 'Unknown';
-                entCounts[ent] = (entCounts[ent] || 0) + 1;
-            });
-
-            const topEnts = Object.entries(entCounts)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 10);
-
-            if (chartInstances.enterprise) chartInstances.enterprise.destroy();
-            chartInstances.enterprise = new Chart(document.getElementById('enterpriseChart'), {
+            // Reprocessing volume by day
+            if (chartInstances.volume) chartInstances.volume.destroy();
+            chartInstances.volume = new Chart(document.getElementById('reprocessingVolumeChart'), {
                 type: 'bar',
                 data: {
-                    labels: topEnts.map(e => e[0].substring(0, 15)),
+                    labels: sortedDates.map(d => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
                     datasets: [{
-                        label: 'Total SKUs',
-                        data: topEnts.map(e => e[1]),
-                        backgroundColor: '#a78bfa',
-                        borderColor: '#a78bfa',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: '#a0a9b8' } } },
-                    scales: {
-                        x: { grid: { color: 'rgba(167, 139, 250, 0.1)' }, ticks: { color: '#a0a9b8' } },
-                        y: { ticks: { color: '#a0a9b8' } }
-                    }
-                }
-            });
-
-            // QC time distribution
-            const qcDays = rows.map(r => parseFloat(r['days_betweem_latest_image_and-image_qc_done']) || 0).filter(d => d > 0);
-            const bins = { '0-1 days': 0, '1-3 days': 0, '3-5 days': 0, '5-10 days': 0, '10+ days': 0 };
-            qcDays.forEach(d => {
-                if (d <= 1) bins['0-1 days']++;
-                else if (d <= 3) bins['1-3 days']++;
-                else if (d <= 5) bins['3-5 days']++;
-                else if (d <= 10) bins['5-10 days']++;
-                else bins['10+ days']++;
-            });
-
-            if (chartInstances.qcTime) chartInstances.qcTime.destroy();
-            chartInstances.qcTime = new Chart(document.getElementById('qcTimeChart'), {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(bins),
-                    datasets: [{
-                        label: 'Count',
-                        data: Object.values(bins),
+                        label: 'Daily Reprocessing Volume',
+                        data: trendValues,
                         backgroundColor: '#f472b6',
                         borderColor: '#f472b6',
                         borderWidth: 1
@@ -1298,86 +837,289 @@
                     maintainAspectRatio: false,
                     plugins: { legend: { labels: { color: '#a0a9b8' } } },
                     scales: {
-                        y: { grid: { color: 'rgba(167, 139, 250, 0.1)' }, ticks: { color: '#a0a9b8' } },
+                        y: { beginAtZero: true, grid: { color: 'rgba(167, 139, 250, 0.1)' }, ticks: { color: '#a0a9b8' } },
                         x: { ticks: { color: '#a0a9b8' } }
                     }
                 }
             });
+
+            // Segment chart
+            const segmentData = {};
+            const today = new Date().toISOString().split('T')[0];
+            rows.forEach(r => {
+                const segment = r['customer-segment'] || 'Unknown';
+                if (!segmentData[segment]) {
+                    segmentData[segment] = { total: 0, reprocessed: 0 };
+                }
+                segmentData[segment].total++;
+                if (String(r['latest_image_added_on'] || '').includes(today)) {
+                    segmentData[segment].reprocessed++;
+                }
+            });
+
+            const segments = Object.keys(segmentData);
+            const segmentReprocessed = segments.map(s => segmentData[s].reprocessed);
+
+            if (chartInstances.segment) chartInstances.segment.destroy();
+            chartInstances.segment = new Chart(document.getElementById('segmentChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: segments,
+                    datasets: [{
+                        data: segmentReprocessed,
+                        backgroundColor: ['#a78bfa', '#f472b6', '#60a5fa', '#10b981'],
+                        borderColor: '#141b2f',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#a0a9b8', padding: 20 } } }
+                }
+            });
         }
 
-        function updateAnalyticsTables() {
+        function updateTables() {
             const rows = dashboardData.rows;
+            const today = new Date().toISOString().split('T')[0];
 
             // Enterprise table
             const entStats = {};
             rows.forEach(r => {
                 const ent = r['enterprise_name'] || 'Unknown';
                 if (!entStats[ent]) {
-                    entStats[ent] = { total: 0, qcCompleted: 0, totalDays: 0, daysCount: 0, totalArr: 0, stage: r['ed.stage'] || 'N/A' };
+                    entStats[ent] = {
+                        total: 0,
+                        reprocessed: 0,
+                        today: 0,
+                        segment: r['customer-segment'] || 'N/A',
+                        stage: r['ed.stage'] || 'N/A'
+                    };
                 }
                 entStats[ent].total++;
-                if (r['qc_done_count'] > 0) entStats[ent].qcCompleted++;
-                const days = parseFloat(r['days_betweem_latest_image_and-image_qc_done']) || 0;
-                if (days > 0) { entStats[ent].totalDays += days; entStats[ent].daysCount++; }
-                entStats[ent].totalArr += parseFloat(r['contracted_arr']) || 0;
+                if (String(r['latest_image_added_on'] || '').includes(today)) {
+                    entStats[ent].reprocessed++;
+                    entStats[ent].today++;
+                }
             });
 
             const entRows = Object.entries(entStats)
-                .sort((a, b) => b[1].total - a[1].total)
-                .slice(0, 15)
+                .sort((a, b) => b[1].reprocessed - a[1].reprocessed)
+                .slice(0, 20)
                 .map(([ent, stats]) => {
-                    const avgDays = stats.daysCount > 0 ? (stats.totalDays / stats.daysCount).toFixed(1) : 'N/A';
-                    const rate = ((stats.qcCompleted / stats.total) * 100).toFixed(1);
-                    const arr = `$${(stats.totalArr / 1000000).toFixed(1)}M`;
+                    const rate = ((stats.reprocessed / stats.total) * 100).toFixed(1);
                     return `<tr>
-                        <td>${ent}</td>
+                        <td><strong>${ent}</strong></td>
                         <td>${stats.total}</td>
-                        <td><span class="badge badge-info">${stats.stage}</span></td>
-                        <td>${avgDays}</td>
-                        <td>${arr}</td>
-                        <td><span class="badge ${rate > 80 ? 'badge-success' : 'badge-warning'}">${rate}%</span></td>
+                        <td><span class="badge badge-danger">${stats.reprocessed}</span></td>
+                        <td>${rate}%</td>
+                        <td><span class="badge badge-info">${stats.segment}</span></td>
+                        <td><span class="badge badge-success">${stats.stage}</span></td>
+                        <td>${stats.today}</td>
                     </tr>`;
                 }).join('');
 
-            document.getElementById('analEnterpriseTable').innerHTML = entRows;
+            document.getElementById('enterpriseReprocessTable').innerHTML = entRows;
 
-            // POC table
+            // CS POC table
             const pocStats = {};
             rows.forEach(r => {
                 const poc = r['cs_poc_email'] || 'Unknown';
                 const ent = r['enterprise_name'];
                 if (!pocStats[poc]) {
-                    pocStats[poc] = { total: 0, today: 0, totalDays: 0, daysCount: 0, enterprises: new Set() };
+                    pocStats[poc] = {
+                        total: 0,
+                        reprocessed: 0,
+                        today: 0,
+                        enterprises: new Set(),
+                        totalDays: 0,
+                        daysCount: 0
+                    };
                 }
                 pocStats[poc].total++;
                 pocStats[poc].enterprises.add(ent);
-                if (String(r['latest_image_added_on'] || '').includes(new Date().toISOString().split('T')[0])) pocStats[poc].today++;
+                if (String(r['latest_image_added_on'] || '').includes(today)) {
+                    pocStats[poc].reprocessed++;
+                    pocStats[poc].today++;
+                }
                 const days = parseFloat(r['days_betweem_latest_image_and-image_qc_done']) || 0;
                 if (days > 0) { pocStats[poc].totalDays += days; pocStats[poc].daysCount++; }
             });
 
             const pocRows = Object.entries(pocStats)
-                .sort((a, b) => b[1].total - a[1].total)
+                .sort((a, b) => b[1].reprocessed - a[1].reprocessed)
                 .slice(0, 15)
                 .map(([poc, stats]) => {
+                    const rate = ((stats.reprocessed / stats.total) * 100).toFixed(1);
                     const avgDays = stats.daysCount > 0 ? (stats.totalDays / stats.daysCount).toFixed(1) : 'N/A';
-                    const workload = stats.total > 3500 ? 'High' : stats.total > 2000 ? 'Medium' : 'Low';
-                    const workloadColor = workload === 'High' ? 'badge-danger' : workload === 'Medium' ? 'badge-warning' : 'badge-success';
                     return `<tr>
                         <td>${poc}</td>
                         <td>${stats.total}</td>
+                        <td><span class="badge badge-danger">${stats.reprocessed}</span></td>
+                        <td>${rate}%</td>
                         <td>${stats.enterprises.size}</td>
-                        <td>${avgDays}</td>
                         <td>${stats.today}</td>
-                        <td><span class="badge ${workloadColor}">${workload}</span></td>
+                        <td>${avgDays}</td>
                     </tr>`;
                 }).join('');
 
-            document.getElementById('analPocTable').innerHTML = pocRows;
+            document.getElementById('csPocTable').innerHTML = pocRows;
+
+            // OB POC table
+            const obStats = {};
+            rows.forEach(r => {
+                const ob = r['ob_poc_email'] || 'Unknown';
+                const ent = r['enterprise_name'];
+                if (!obStats[ob]) {
+                    obStats[ob] = {
+                        total: 0,
+                        reprocessed: 0,
+                        today: 0,
+                        enterprises: new Set()
+                    };
+                }
+                obStats[ob].total++;
+                obStats[ob].enterprises.add(ent);
+                if (String(r['latest_image_added_on'] || '').includes(today)) {
+                    obStats[ob].reprocessed++;
+                    obStats[ob].today++;
+                }
+            });
+
+            const obRows = Object.entries(obStats)
+                .sort((a, b) => b[1].reprocessed - a[1].reprocessed)
+                .slice(0, 15)
+                .map(([ob, stats]) => {
+                    const rate = ((stats.reprocessed / stats.total) * 100).toFixed(1);
+                    return `<tr>
+                        <td>${ob}</td>
+                        <td>${stats.total}</td>
+                        <td><span class="badge badge-danger">${stats.reprocessed}</span></td>
+                        <td>${rate}%</td>
+                        <td>${stats.enterprises.size}</td>
+                        <td>${stats.today}</td>
+                    </tr>`;
+                }).join('');
+
+            document.getElementById('obPocTable').innerHTML = obRows;
+
+            // Segment table
+            const segmentStats = {};
+            rows.forEach(r => {
+                const segment = r['customer-segment'] || 'Unknown';
+                if (!segmentStats[segment]) {
+                    segmentStats[segment] = { total: 0, reprocessed: 0, today: 0 };
+                }
+                segmentStats[segment].total++;
+                if (String(r['latest_image_added_on'] || '').includes(today)) {
+                    segmentStats[segment].reprocessed++;
+                    segmentStats[segment].today++;
+                }
+            });
+
+            const segmentRows = Object.entries(segmentStats)
+                .sort((a, b) => b[1].reprocessed - a[1].reprocessed)
+                .map(([segment, stats]) => {
+                    const rate = ((stats.reprocessed / stats.total) * 100).toFixed(1);
+                    return `<tr>
+                        <td><strong>${segment}</strong></td>
+                        <td>${stats.total}</td>
+                        <td><span class="badge badge-danger">${stats.reprocessed}</span></td>
+                        <td>${rate}%</td>
+                        <td>${stats.today}</td>
+                    </tr>`;
+                }).join('');
+
+            document.getElementById('segmentTable').innerHTML = segmentRows;
+        }
+
+        function showDrillDown(type) {
+            const modal = document.getElementById('drillDownModal');
+            const title = document.getElementById('drillDownTitle');
+            const content = document.getElementById('drillDownContent');
+
+            const rows = dashboardData.rows;
+            const today = new Date().toISOString().split('T')[0];
+
+            let html = '';
+
+            if (type === 'totalSkus') {
+                title.textContent = 'Total SKUs Breakdown';
+                const entStats = {};
+                rows.forEach(r => {
+                    const ent = r['enterprise_name'] || 'Unknown';
+                    entStats[ent] = (entStats[ent] || 0) + 1;
+                });
+                html = '<table style="width: 100%; border-collapse: collapse;"><thead><tr><th style="border-bottom: 1px solid #2a3350; padding: 10px; text-align: left;">Enterprise</th><th style="border-bottom: 1px solid #2a3350; padding: 10px;">Count</th></tr></thead><tbody>' +
+                    Object.entries(entStats).sort((a, b) => b[1] - a[1]).map(([ent, count]) => 
+                        `<tr><td style="border-bottom: 1px solid #2a3350; padding: 10px;">${ent}</td><td style="border-bottom: 1px solid #2a3350; padding: 10px; text-align: center;">${count}</td></tr>`
+                    ).join('') +
+                    '</tbody></table>';
+            } else if (type === 'reprocessedToday') {
+                title.textContent = 'Reprocessed Today';
+                const reprocessed = rows.filter(r => String(r['latest_image_added_on'] || '').includes(today));
+                html = `<p>Total SKUs reprocessed today: <strong>${reprocessed.length}</strong></p>
+                        <p>Percentage: <strong>${((reprocessed.length / rows.length) * 100).toFixed(1)}%</strong></p>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                        <thead><tr><th style="border-bottom: 1px solid #2a3350; padding: 10px; text-align: left;">SKU ID</th><th style="border-bottom: 1px solid #2a3350; padding: 10px;">Enterprise</th><th style="border-bottom: 1px solid #2a3350; padding: 10px;">CS POC</th></tr></thead>
+                        <tbody>` +
+                        reprocessed.slice(0, 50).map(r => `<tr><td style="border-bottom: 1px solid #2a3350; padding: 10px;">${r['sb.sku_id']}</td><td style="border-bottom: 1px solid #2a3350; padding: 10px;">${r['enterprise_name']}</td><td style="border-bottom: 1px solid #2a3350; padding: 10px;">${r['cs_poc_email']}</td></tr>`).join('') +
+                        '</tbody></table>';
+            } else if (type === 'reprocessedWith7d') {
+                title.textContent = 'Reprocessed (7 Days)';
+                const sevenDaysAgo = new Date();
+                sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                const reprocessed = rows.filter(r => {
+                    const d = new Date(r['latest_image_added_on']);
+                    return d >= sevenDaysAgo;
+                });
+                html = `<p>Total SKUs reprocessed (7 days): <strong>${reprocessed.length}</strong></p>
+                        <p>Daily average: <strong>${(reprocessed.length / 7).toFixed(1)}</strong></p>
+                        <p>Percentage of total: <strong>${((reprocessed.length / rows.length) * 100).toFixed(1)}%</strong></p>`;
+            } else if (type === 'reprocessedWith30d') {
+                title.textContent = 'Reprocessed (30 Days)';
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                const reprocessed = rows.filter(r => {
+                    const d = new Date(r['latest_image_added_on']);
+                    return d >= thirtyDaysAgo;
+                });
+                html = `<p>Total SKUs reprocessed (30 days): <strong>${reprocessed.length}</strong></p>
+                        <p>Daily average: <strong>${(reprocessed.length / 30).toFixed(1)}</strong></p>
+                        <p>Percentage of total: <strong>${((reprocessed.length / rows.length) * 100).toFixed(1)}%</strong></p>`;
+            } else if (type === 'avgQcTime') {
+                title.textContent = 'QC Time Analysis';
+                const days = rows.map(r => parseFloat(r['days_betweem_latest_image_and-image_qc_done']) || 0).filter(d => d > 0);
+                const avg = days.length > 0 ? (days.reduce((a, b) => a + b) / days.length).toFixed(2) : 'N/A';
+                const median = days.length > 0 ? days.sort((a, b) => a - b)[Math.floor(days.length / 2)].toFixed(2) : 'N/A';
+                const max = days.length > 0 ? Math.max(...days).toFixed(2) : 'N/A';
+                const min = days.length > 0 ? Math.min(...days).toFixed(2) : 'N/A';
+                html = `<p>Average QC Time: <strong>${avg} days</strong></p>
+                        <p>Median QC Time: <strong>${median} days</strong></p>
+                        <p>Max QC Time: <strong>${max} days</strong></p>
+                        <p>Min QC Time: <strong>${min} days</strong></p>
+                        <p>SKUs with QC data: <strong>${days.length}</strong></p>`;
+            } else if (type === 'qcCompletion') {
+                title.textContent = 'QC Completion Analysis';
+                const completed = rows.filter(r => r['qc_done_count'] > 0).length;
+                const pending = rows.filter(r => r['qc_done_count'] === 0).length;
+                const rate = ((completed / rows.length) * 100).toFixed(1);
+                html = `<p>QC Completed: <strong>${completed}</strong> (${rate}%)</p>
+                        <p>QC Pending: <strong>${pending}</strong> (${(100 - rate).toFixed(1)}%)</p>
+                        <p>Total SKUs: <strong>${rows.length}</strong></p>`;
+            }
+
+            content.innerHTML = html;
+            modal.classList.add('active');
+        }
+
+        function closeDrillDown() {
+            document.getElementById('drillDownModal').classList.remove('active');
         }
 
         window.addEventListener('load', () => {
-            console.log('Dashboard ready. Import or load data to get started.');
+            console.log('Dashboard ready. Import data to get started.');
         });
     </script>
 </body>
