@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SKU Analytics Dashboard</title>
+    <title>SKU Reprocessing Monitor</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
     <style>
         * {
@@ -12,23 +12,42 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --color-primary: #378ADD;
+            --color-success: #639922;
+            --color-warning: #BA7517;
+            --color-danger: #E24B4A;
+            --color-bg-primary: #ffffff;
+            --color-bg-secondary: #f5f5f5;
+            --color-text-primary: #1a1a1a;
+            --color-text-secondary: #666666;
+            --color-border: #e0e0e0;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-bg-primary: #1a1a1a;
+                --color-bg-secondary: #2d2d2d;
+                --color-text-primary: #ffffff;
+                --color-text-secondary: #b0b0b0;
+                --color-border: #404040;
+            }
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--color-bg-secondary);
+            color: var(--color-text-primary);
+            line-height: 1.6;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
+            padding: 20px;
         }
 
-        .header {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        header {
             margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
@@ -37,935 +56,836 @@
             gap: 20px;
         }
 
-        .header h1 {
+        h1 {
             font-size: 28px;
-            color: #2c3e50;
+            font-weight: 600;
         }
 
-        .header .status {
+        .header-controls {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 8px 16px;
+            border: 1px solid var(--color-border);
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            border-radius: 6px;
+            cursor: pointer;
             font-size: 14px;
-            color: #666;
+            transition: all 0.2s;
         }
 
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #27ae60;
-            animation: pulse 2s infinite;
+        button:hover {
+            background: var(--color-bg-secondary);
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        button.primary {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+
+        button.primary:hover {
+            opacity: 0.9;
+        }
+
+        .config-panel {
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .config-panel h2 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: var(--color-text-primary);
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: var(--color-text-secondary);
+        }
+
+        input[type="text"],
+        input[type="url"],
+        input[type="number"],
+        input[type="date"],
+        select {
+            padding: 8px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            font-size: 14px;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(55, 138, 221, 0.1);
         }
 
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            gap: 15px;
             margin-bottom: 30px;
         }
 
         .metric-card {
-            background: white;
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
             padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .metric-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        .metric-label {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            margin-bottom: 8px;
         }
 
-        .metric-card .label {
-            font-size: 12px;
-            color: #7f8c8d;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        .metric-card .value {
+        .metric-value {
             font-size: 32px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--color-primary);
         }
 
-        .metric-card .change {
-            font-size: 12px;
-            color: #27ae60;
+        .metric-card.success .metric-value {
+            color: var(--color-success);
+        }
+
+        .metric-card.warning .metric-value {
+            color: var(--color-warning);
+        }
+
+        .metric-card.danger .metric-value {
+            color: var(--color-danger);
         }
 
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 20px;
+            gap: 30px;
             margin-bottom: 30px;
         }
 
         .chart-container {
-            background: white;
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
             padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .chart-container h3 {
+        .chart-container h2 {
             font-size: 16px;
-            color: #2c3e50;
             margin-bottom: 20px;
+            color: var(--color-text-primary);
             font-weight: 600;
         }
 
         .chart-wrapper {
             position: relative;
             height: 300px;
-            margin-bottom: 15px;
         }
 
         .table-container {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            overflow: hidden;
             margin-bottom: 30px;
-            overflow-x: auto;
         }
 
-        .table-container h3 {
+        .table-container h2 {
             font-size: 16px;
-            color: #2c3e50;
-            margin-bottom: 20px;
+            padding: 20px 20px 0 20px;
+            margin-bottom: 15px;
+            color: var(--color-text-primary);
             font-weight: 600;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead {
+            background: var(--color-bg-secondary);
         }
 
         th {
-            background: #f8f9fa;
-            padding: 12px;
+            padding: 12px 20px;
             text-align: left;
             font-weight: 600;
-            color: #2c3e50;
-            border-bottom: 2px solid #e9ecef;
-            font-size: 13px;
+            color: var(--color-text-primary);
+            border-bottom: 1px solid var(--color-border);
         }
 
         td {
-            padding: 12px;
-            border-bottom: 1px solid #e9ecef;
-            font-size: 13px;
-            color: #555;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--color-border);
+            color: var(--color-text-secondary);
         }
 
-        tr:hover {
-            background: #f8f9fa;
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: var(--color-bg-secondary);
         }
 
         .loading {
             text-align: center;
             padding: 40px;
-            font-size: 16px;
-            color: #666;
+            color: var(--color-text-secondary);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--color-border);
+            border-top-color: var(--color-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .error {
             background: #fee;
+            border: 1px solid #fcc;
             color: #c33;
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid #c33;
+            padding: 15px;
+            border-radius: 6px;
             margin-bottom: 20px;
-            line-height: 1.6;
         }
 
-        .error code {
-            background: rgba(0,0,0,0.1);
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-        }
-
-        .error strong {
-            color: #b22;
-        }
-
-        .manual-input-section {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-
-        .manual-input-section h3 {
-            margin-bottom: 15px;
-            color: #2c3e50;
-        }
-
-        .manual-input-section textarea {
-            width: 100%;
-            height: 200px;
-            padding: 12px;
-            border: 1px solid #ddd;
+        .success {
+            background: #efe;
+            border: 1px solid #cfc;
+            color: #3c3;
+            padding: 15px;
             border-radius: 6px;
-            font-family: monospace;
-            font-size: 12px;
-            margin-bottom: 12px;
-            resize: vertical;
+            margin-bottom: 20px;
         }
 
-        .button-group {
-            display: flex;
+        .refresh-time {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 8px 12px;
+            }
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 10px;
-            flex-wrap: wrap;
+            font-size: 12px;
+            margin-top: 10px;
         }
 
-        .refresh-btn {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
+        .stat-item {
+            background: var(--color-bg-secondary);
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+
+        .stat-label {
+            color: var(--color-text-secondary);
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 18px;
             font-weight: 600;
-            transition: background 0.3s ease;
+            color: var(--color-primary);
+            margin-top: 4px;
         }
 
-        .refresh-btn:hover {
-            background: #2980b9;
-        }
-
-        .refresh-btn:active {
-            transform: scale(0.98);
-        }
-
-        .legend {
+        .export-section {
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 20px;
             display: flex;
+            justify-content: space-between;
+            align-items: center;
             flex-wrap: wrap;
             gap: 15px;
-            margin-top: 15px;
-            font-size: 12px;
         }
 
-        .legend-item {
+        .tabs {
             display: flex;
-            align-items: center;
-            gap: 6px;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--color-border);
         }
 
-        .legend-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 2px;
+        .tab-button {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            border-bottom: 2px solid transparent;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-button.active {
+            border-bottom-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
+        <header>
+            <h1>📊 SKU Reprocessing Monitor</h1>
+            <div class="header-controls">
+                <button class="primary" onclick="loadData()">
+                    🔄 Refresh Data
+                </button>
+                <button onclick="toggleConfig()">⚙️ Settings</button>
+                <button onclick="exportData()">📥 Export CSV</button>
+            </div>
+        </header>
+
+        <div id="configPanel" class="config-panel" style="display: none;">
+            <h2>Dashboard Configuration</h2>
+            <div class="tabs">
+                <button class="tab-button active" onclick="switchTab('metabase')">Metabase API</button>
+                <button class="tab-button" onclick="switchTab('manual')">Manual Data</button>
+            </div>
+
+            <div id="metabase" class="tab-content active">
+                <div class="config-grid">
+                    <div class="form-group">
+                        <label>Metabase Base URL</label>
+                        <input type="url" id="metabaseUrl" placeholder="https://metabase.spyne.ai" value="https://metabase.spyne.ai">
+                    </div>
+                    <div class="form-group">
+                        <label>Question ID</label>
+                        <input type="text" id="questionId" placeholder="6ecd9fc8-a838-4d49-9f67-efde76b85c2c" value="6ecd9fc8-a838-4d49-9f67-efde76b85c2c">
+                    </div>
+                    <div class="form-group">
+                        <label>Metabase API Key (Optional)</label>
+                        <input type="text" id="apiKey" placeholder="Leave empty for public questions">
+                    </div>
+                    <div class="form-group">
+                        <label>Auto Refresh (minutes)</label>
+                        <input type="number" id="refreshInterval" value="15" min="5">
+                    </div>
+                </div>
+                <button class="primary" style="margin-top: 15px;" onclick="testConnection()">
+                    🔗 Test Connection
+                </button>
+            </div>
+
+            <div id="manual" class="tab-content">
+                <p style="margin-bottom: 15px; color: var(--color-text-secondary);">Upload your CSV file with the following columns:</p>
+                <p style="margin-bottom: 15px; font-size: 12px; color: var(--color-text-secondary);">
+                    <strong>Required columns:</strong> sb.sku_id, sku_created_on, latest_image_added_on, distinct_image_count, qc_done_count, enterprise_name, cs_poc_email
+                </p>
+                <input type="file" id="csvFile" accept=".csv" onchange="loadCSVData()">
+            </div>
+        </div>
+
+        <div id="messageArea"></div>
+
+        <div id="metricsGrid" class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Total SKUs</div>
+                <div class="metric-value" id="totalSkus">0</div>
+            </div>
+            <div class="metric-card success">
+                <div class="metric-label">SKUs Reprocessed Today</div>
+                <div class="metric-value" id="reprocessedToday">0</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Avg QC Time (hours)</div>
+                <div class="metric-value" id="avgQcTime">0</div>
+            </div>
+            <div class="metric-card warning">
+                <div class="metric-label">Active Enterprises</div>
+                <div class="metric-value" id="activeEnterprises">0</div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-container">
+                <h2>Daily Reprocessing Trend (30 days)</h2>
+                <div class="chart-wrapper">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-container">
+                <h2>QC Processing Status</h2>
+                <div class="chart-wrapper">
+                    <canvas id="qcChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <h2>Top Enterprises by Reprocessing</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Enterprise Name</th>
+                        <th>SKUs Today</th>
+                        <th>7-Day Avg</th>
+                        <th>Total ARR</th>
+                        <th>Customer Segment</th>
+                    </tr>
+                </thead>
+                <tbody id="enterpriseTable">
+                    <tr><td colspan="5" style="text-align: center; color: var(--color-text-secondary);">No data yet. Load data to see enterprise breakdown.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-container">
+            <h2>CS POC Performance</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>CS POC Email</th>
+                        <th>SKUs Today</th>
+                        <th>Avg Days to QC</th>
+                        <th>Total SKUs Managed</th>
+                        <th>Avg Reprocessing Rate</th>
+                    </tr>
+                </thead>
+                <tbody id="pocTable">
+                    <tr><td colspan="5" style="text-align: center; color: var(--color-text-secondary);">No data yet. Load data to see CS POC performance.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="export-section">
             <div>
-                <h1>SKU Analytics Dashboard</h1>
-                <p style="color: #7f8c8d; font-size: 14px; margin-top: 5px;">Live data from Metabase</p>
-            </div>
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <div class="status">
-                    <div class="status-dot"></div>
-                    <span id="status-text">Connecting...</span>
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="refresh-btn" onclick="fetchData()">Refresh Data</button>
-                    <button class="refresh-btn" onclick="document.getElementById('manual-input').style.display = 'block'" style="background: #95a5a6;">Or Input CSV</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="error-container"></div>
-
-        <div id="manual-input" class="manual-input-section" style="display: none;">
-            <h3>📋 Manual Data Input</h3>
-            <p style="color: #666; margin-bottom: 12px; font-size: 14px;">
-                If automatic sync isn't working, you can manually paste Metabase data here:<br>
-                1. Go to your Metabase question<br>
-                2. Click <strong>Download</strong> → Select <strong>CSV</strong><br>
-                3. Copy the CSV data and paste it below
-            </p>
-            <textarea id="csv-input" placeholder="Paste CSV data here..."></textarea>
-            <div class="button-group">
-                <button class="refresh-btn" onclick="parseCSVData()" style="background: #27ae60;">Load CSV Data</button>
-                <button class="refresh-btn" onclick="document.getElementById('manual-input').style.display = 'none'">Close</button>
-            </div>
-        </div>
-
-        <div id="loading" class="loading" style="display: none;">
-            Loading dashboard data...
-        </div>
-
-        <div id="dashboard" style="display: none;">
-            <!-- Metric Cards -->
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <div class="label">Total SKUs</div>
-                    <div class="value" id="total-skus">0</div>
-                    <div class="change">Active</div>
-                </div>
-                <div class="metric-card">
-                    <div class="label">Avg Images per SKU</div>
-                    <div class="value" id="avg-images">0</div>
-                    <div class="change">Total uploads</div>
-                </div>
-                <div class="metric-card">
-                    <div class="label">Avg QC Checks</div>
-                    <div class="value" id="avg-qc">0</div>
-                    <div class="change">Per SKU</div>
-                </div>
-                <div class="metric-card">
-                    <div class="label">Avg Days Gap</div>
-                    <div class="value" id="avg-days-gap">0</div>
-                    <div class="change">Image to QC</div>
-                </div>
-                <div class="metric-card">
-                    <div class="label">QC Completion Rate</div>
-                    <div class="value" id="qc-completion">0%</div>
-                    <div class="change">SKUs completed</div>
-                </div>
-                <div class="metric-card">
-                    <div class="label">Total Images</div>
-                    <div class="value" id="total-images">0</div>
-                    <div class="change">All uploads</div>
-                </div>
-            </div>
-
-            <!-- Charts Grid -->
-            <div class="charts-grid">
-                <div class="chart-container">
-                    <h3>Distribution of Images per SKU</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="images-distribution"></canvas>
+                <strong>Dashboard Status</strong>
+                <div class="summary-stats" id="summaryStats">
+                    <div class="stat-item">
+                        <div class="stat-label">Last Updated</div>
+                        <div class="stat-value" id="lastUpdate">Never</div>
                     </div>
-                </div>
-
-                <div class="chart-container">
-                    <h3>QC Checks Distribution</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="qc-distribution"></canvas>
-                    </div>
-                </div>
-
-                <div class="chart-container">
-                    <h3>Days Gap: Image to QC</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="days-gap-distribution"></canvas>
-                    </div>
-                </div>
-
-                <div class="chart-container">
-                    <h3>Image Addition Frequency</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="image-addon-distribution"></canvas>
-                    </div>
-                </div>
-
-                <div class="chart-container">
-                    <h3>SKU Creation Timeline</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="sku-timeline"></canvas>
-                    </div>
-                </div>
-
-                <div class="chart-container">
-                    <h3>QC Status Overview</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="qc-status"></canvas>
+                    <div class="stat-item">
+                        <div class="stat-label">Records Loaded</div>
+                        <div class="stat-value" id="recordCount">0</div>
                     </div>
                 </div>
             </div>
-
-            <!-- Top SKUs Table -->
-            <div class="table-container">
-                <h3>Top 10 SKUs by Image Count</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>SKU ID</th>
-                            <th>Created Date</th>
-                            <th>Image Count</th>
-                            <th>QC Done Count</th>
-                            <th>Image Add Count</th>
-                            <th>Days to QC</th>
-                            <th>Last Image Added</th>
-                            <th>Last QC Done</th>
-                        </tr>
-                    </thead>
-                    <tbody id="top-skus-tbody">
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Statistics Table -->
-            <div class="table-container">
-                <h3>Key Statistics</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Metric</th>
-                            <th>Value</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody id="stats-tbody">
-                    </tbody>
-                </table>
+            <div>
+                <button class="primary" onclick="downloadSampleData()">📄 Download Sample CSV</button>
+                <button class="primary" onclick="scheduleAutoRefresh()">⏱️ Schedule Auto Refresh</button>
             </div>
         </div>
     </div>
 
     <script>
-        const METABASE_URL = 'https://metabase.spyne.ai';
-        const QUESTION_ID = '6ecd9fc8-a838-4d49-9f67-efde76b85c2c';
-
         let chartInstances = {};
-        let rawData = [];
+        let dashboardData = {
+            rows: [],
+            lastUpdate: null
+        };
 
-        async function fetchData() {
+        function toggleConfig() {
+            const panel = document.getElementById('configPanel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        async function testConnection() {
+            const url = document.getElementById('metabaseUrl').value;
+            const questionId = document.getElementById('questionId').value;
+            const apiKey = document.getElementById('apiKey').value;
+
+            showMessage('Testing connection...', 'loading');
+
             try {
-                document.getElementById('loading').style.display = 'block';
-                document.getElementById('dashboard').style.display = 'none';
-                document.getElementById('error-container').innerHTML = '';
-                updateStatus('Fetching data...', false);
-
-                // Try multiple endpoints
-                let result = null;
-                let endpoint = '';
-
-                try {
-                    // Endpoint 1: Try public/card query with parameters
-                    endpoint = `${METABASE_URL}/api/public/card/${QUESTION_ID}/query`;
-                    console.log('Trying endpoint:', endpoint);
-                    const response1 = await fetch(endpoint, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                    
-                    if (response1.ok) {
-                        result = await response1.json();
-                    }
-                } catch (e) {
-                    console.log('Endpoint 1 failed, trying alternative...');
-                }
-
-                if (!result) {
-                    try {
-                        // Endpoint 2: Try public/question endpoint
-                        endpoint = `${METABASE_URL}/api/public/question/${QUESTION_ID}`;
-                        console.log('Trying endpoint:', endpoint);
-                        const response2 = await fetch(endpoint, {
-                            method: 'GET',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            }
-                        });
-                        
-                        if (response2.ok) {
-                            result = await response2.json();
-                        }
-                    } catch (e) {
-                        console.log('Endpoint 2 failed');
-                    }
-                }
-
-                if (!result) {
-                    throw new Error('Could not fetch from Metabase API. Please check: 1) Internet connection, 2) Question ID is correct, 3) Question is public');
-                }
-
-                // Parse the response based on structure
-                let rows = [];
-                let cols = [];
-
-                if (result.data && result.data.rows) {
-                    rows = result.data.rows;
-                    cols = result.data.cols;
-                } else if (result.data && result.data.results && result.data.results.rows) {
-                    rows = result.data.results.rows;
-                    cols = result.data.results.cols;
-                } else if (result.rows) {
-                    rows = result.rows;
-                    cols = result.cols || result.columns || [];
-                } else {
-                    throw new Error('Unexpected response format from Metabase');
-                }
-
-                if (!rows || rows.length === 0) {
-                    throw new Error('No data rows found in response');
-                }
-
-                // Map column names if needed
-                const columnMapping = {
-                    'S.SKU_ID': 'sku_id',
-                    's.sku_id': 'sku_id',
-                    'SKU_ID': 'sku_id',
-                    'S.SKU_CREATED_ON': 'sku_created_on',
-                    's.sku_created_on': 'sku_created_on',
-                    'SKU_CREATED_ON': 'sku_created_on',
-                    'LATEST_IMAGE_ADDED_TIME': 'latest_image_added_time',
-                    'LATEST_QC_DONE_TIME': 'latest_qc_done_time',
-                    'QC_DONE_COUNT': 'qc_done_count',
-                    'DISTINCT_IMAGE_COUNT': 'disticnt_image_count',
-                    'DISTICNT_IMAGE_COUNT': 'disticnt_image_count',
-                    'IMAGE_ADDON_COUNT': 'image_addon_count',
-                    'DAYS_BETWEEN_LATEST_IMAGE_AND_QC_DONE': 'days_between_latest_image_and_qc_done'
-                };
-
-                rawData = rows.map((row) => {
-                    const record = {};
-                    if (Array.isArray(row)) {
-                        // Array format
-                        cols.forEach((col, colIdx) => {
-                            const colName = typeof col === 'string' ? col : (col.name || col.display_name || '');
-                            const mappedName = columnMapping[colName] || columnMapping[colName.toUpperCase()] || colName.toLowerCase();
-                            record[mappedName] = row[colIdx];
-                        });
-                    } else {
-                        // Object format
-                        Object.keys(row).forEach(key => {
-                            const mappedName = columnMapping[key] || columnMapping[key.toUpperCase()] || key.toLowerCase();
-                            record[mappedName] = row[key];
-                        });
-                    }
-                    return record;
-                });
-
-                if (rawData.length === 0) {
-                    throw new Error('No valid data records found');
-                }
-
-                console.log('Data loaded successfully:', rawData.length, 'records');
-                console.log('Sample record:', rawData[0]);
-                processData();
-                renderDashboard();
-                updateStatus('Connected', true);
-
-            } catch (error) {
-                console.error('Fetch error:', error);
-                showError(`
-                    <strong>Connection Error:</strong> ${error.message}<br><br>
-                    <strong>Troubleshooting:</strong><br>
-                    1. Ensure your Metabase question is set to <strong>Public</strong><br>
-                    2. Check the Question ID: <code>${QUESTION_ID}</code><br>
-                    3. Verify internet connection<br>
-                    4. Try refreshing the page<br><br>
-                    <strong>Alternative:</strong> Export data from Metabase as CSV and paste it below to test the dashboard.
-                `);
-                updateStatus('Connection failed', false);
-                document.getElementById('loading').style.display = 'none';
-            }
-        }
-
-        function updateStatus(text, isConnected) {
-            document.getElementById('status-text').textContent = text;
-            const dot = document.querySelector('.status-dot');
-            if (isConnected) {
-                dot.style.background = '#27ae60';
-            } else {
-                dot.style.background = '#e74c3c';
-            }
-        }
-
-        function showError(message) {
-            const errorDiv = document.getElementById('error-container');
-            errorDiv.innerHTML = `<div class="error">${message}</div>`;
-        }
-
-        function processData() {
-            // Calculate metrics based on raw data
-        }
-
-        function renderDashboard() {
-            // Calculate KPIs
-            const totalSkus = rawData.length;
-            const avgImages = (rawData.reduce((sum, r) => sum + (parseInt(r.disticnt_image_count) || 0), 0) / totalSkus).toFixed(1);
-            const avgQc = (rawData.reduce((sum, r) => sum + (parseInt(r.qc_done_count) || 0), 0) / totalSkus).toFixed(1);
-            const avgDaysGap = (rawData.reduce((sum, r) => sum + (parseFloat(r.days_between_latest_image_and_qc_done) || 0), 0) / totalSkus).toFixed(1);
-            const qcCompleted = rawData.filter(r => parseInt(r.qc_done_count) > 0).length;
-            const qcCompletionRate = ((qcCompleted / totalSkus) * 100).toFixed(1);
-            const totalImages = rawData.reduce((sum, r) => sum + (parseInt(r.disticnt_image_count) || 0), 0);
-
-            // Update metric cards
-            document.getElementById('total-skus').textContent = totalSkus;
-            document.getElementById('avg-images').textContent = avgImages;
-            document.getElementById('avg-qc').textContent = avgQc;
-            document.getElementById('avg-days-gap').textContent = avgDaysGap;
-            document.getElementById('qc-completion').textContent = qcCompletionRate + '%';
-            document.getElementById('total-images').textContent = totalImages;
-
-            // Render charts
-            renderImagesDistribution();
-            renderQcDistribution();
-            renderDaysGapDistribution();
-            renderImageAddonDistribution();
-            renderSkuTimeline();
-            renderQcStatus();
-
-            // Render tables
-            renderTopSkusTable();
-            renderStatistics();
-
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
-        }
-
-        function renderImagesDistribution() {
-            const data = rawData
-                .filter(r => r.disticnt_image_count)
-                .map(r => ({ sku: r.sku_id, count: parseInt(r.disticnt_image_count) || 0 }))
-                .sort((a, b) => b.count - a.count)
-                .slice(0, 10);
-
-            destroyChart('images-distribution');
-            chartInstances['images-distribution'] = new Chart(
-                document.getElementById('images-distribution'),
-                {
-                    type: 'bar',
-                    data: {
-                        labels: data.map(d => d.sku.substring(0, 15)),
-                        datasets: [{
-                            label: 'Image Count',
-                            data: data.map(d => d.count),
-                            backgroundColor: '#3498db',
-                            borderColor: '#2980b9',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        indexAxis: 'y',
-                        plugins: { legend: { display: false } },
-                        scales: { x: { beginAtZero: true } }
-                    }
-                }
-            );
-        }
-
-        function renderQcDistribution() {
-            const bins = [
-                { range: '0', count: 0 },
-                { range: '1-2', count: 0 },
-                { range: '3-5', count: 0 },
-                { range: '6-10', count: 0 },
-                { range: '10+', count: 0 }
-            ];
-
-            rawData.forEach(r => {
-                const qc = parseInt(r.qc_done_count) || 0;
-                if (qc === 0) bins[0].count++;
-                else if (qc <= 2) bins[1].count++;
-                else if (qc <= 5) bins[2].count++;
-                else if (qc <= 10) bins[3].count++;
-                else bins[4].count++;
-            });
-
-            destroyChart('qc-distribution');
-            chartInstances['qc-distribution'] = new Chart(
-                document.getElementById('qc-distribution'),
-                {
-                    type: 'doughnut',
-                    data: {
-                        labels: bins.map(b => b.range),
-                        datasets: [{
-                            data: bins.map(b => b.count),
-                            backgroundColor: ['#e74c3c', '#f39c12', '#f1c40f', '#27ae60', '#3498db'],
-                            borderColor: '#fff',
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { position: 'bottom' } }
-                    }
-                }
-            );
-        }
-
-        function renderDaysGapDistribution() {
-            const gaps = rawData
-                .map(r => parseFloat(r.days_between_latest_image_and_qc_done) || 0)
-                .filter(g => g > 0)
-                .sort((a, b) => a - b);
-
-            const bins = [0, 0, 0, 0, 0];
-            gaps.forEach(g => {
-                if (g <= 1) bins[0]++;
-                else if (g <= 3) bins[1]++;
-                else if (g <= 7) bins[2]++;
-                else if (g <= 14) bins[3]++;
-                else bins[4]++;
-            });
-
-            destroyChart('days-gap-distribution');
-            chartInstances['days-gap-distribution'] = new Chart(
-                document.getElementById('days-gap-distribution'),
-                {
-                    type: 'bar',
-                    data: {
-                        labels: ['0-1 days', '1-3 days', '3-7 days', '7-14 days', '14+ days'],
-                        datasets: [{
-                            label: 'Count',
-                            data: bins,
-                            backgroundColor: '#9b59b6',
-                            borderColor: '#8e44ad',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: true } }
-                    }
-                }
-            );
-        }
-
-        function renderImageAddonDistribution() {
-            const addons = rawData
-                .map(r => parseInt(r.image_addon_count) || 0);
-
-            const max = Math.max(...addons);
-            const bins = Array(Math.min(10, max)).fill(0);
-
-            addons.forEach(addon => {
-                if (addon > 0 && addon <= bins.length) bins[addon - 1]++;
-            });
-
-            destroyChart('image-addon-distribution');
-            chartInstances['image-addon-distribution'] = new Chart(
-                document.getElementById('image-addon-distribution'),
-                {
-                    type: 'line',
-                    data: {
-                        labels: Array.from({length: bins.length}, (_, i) => (i + 1).toString()),
-                        datasets: [{
-                            label: 'Number of SKUs',
-                            data: bins,
-                            borderColor: '#e67e22',
-                            backgroundColor: 'rgba(230, 126, 34, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.4,
-                            fill: true
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: true } },
-                        scales: { y: { beginAtZero: true } }
-                    }
-                }
-            );
-        }
-
-        function renderSkuTimeline() {
-            const months = {};
-            rawData.forEach(r => {
-                if (r.sku_created_on) {
-                    const date = new Date(r.sku_created_on);
-                    const month = date.toISOString().substring(0, 7);
-                    months[month] = (months[month] || 0) + 1;
-                }
-            });
-
-            const sorted = Object.entries(months).sort();
-
-            destroyChart('sku-timeline');
-            chartInstances['sku-timeline'] = new Chart(
-                document.getElementById('sku-timeline'),
-                {
-                    type: 'line',
-                    data: {
-                        labels: sorted.map(([month]) => month),
-                        datasets: [{
-                            label: 'SKUs Created',
-                            data: sorted.map(([, count]) => count),
-                            borderColor: '#16a085',
-                            backgroundColor: 'rgba(22, 160, 133, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.4,
-                            fill: true
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: true } },
-                        scales: { y: { beginAtZero: true } }
-                    }
-                }
-            );
-        }
-
-        function renderQcStatus() {
-            const completed = rawData.filter(r => parseInt(r.qc_done_count) > 0).length;
-            const pending = rawData.filter(r => !r.latest_qc_done_time).length;
-            const inProgress = rawData.length - completed - pending;
-
-            destroyChart('qc-status');
-            chartInstances['qc-status'] = new Chart(
-                document.getElementById('qc-status'),
-                {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Completed', 'Pending', 'In Progress'],
-                        datasets: [{
-                            data: [completed, pending, inProgress],
-                            backgroundColor: ['#27ae60', '#e74c3c', '#f39c12'],
-                            borderColor: '#fff',
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { position: 'bottom' } }
-                    }
-                }
-            );
-        }
-
-        function renderTopSkusTable() {
-            const sorted = rawData
-                .sort((a, b) => (parseInt(b.disticnt_image_count) || 0) - (parseInt(a.disticnt_image_count) || 0))
-                .slice(0, 10);
-
-            const tbody = document.getElementById('top-skus-tbody');
-            tbody.innerHTML = sorted.map(r => `
-                <tr>
-                    <td>${r.sku_id}</td>
-                    <td>${new Date(r.sku_created_on).toLocaleDateString()}</td>
-                    <td>${r.disticnt_image_count || 0}</td>
-                    <td>${r.qc_done_count || 0}</td>
-                    <td>${r.image_addon_count || 0}</td>
-                    <td>${parseFloat(r.days_between_latest_image_and_qc_done || 0).toFixed(1)}</td>
-                    <td>${r.latest_image_added_time ? new Date(r.latest_image_added_time).toLocaleDateString() : 'N/A'}</td>
-                    <td>${r.latest_qc_done_time ? new Date(r.latest_qc_done_time).toLocaleDateString() : 'N/A'}</td>
-                </tr>
-            `).join('');
-        }
-
-        function renderStatistics() {
-            const allQc = rawData.map(r => parseInt(r.qc_done_count) || 0);
-            const allImages = rawData.map(r => parseInt(r.disticnt_image_count) || 0);
-            const allGaps = rawData.map(r => parseFloat(r.days_between_latest_image_and_qc_done) || 0);
-
-            const stats = [
-                { metric: 'Total SKUs', value: rawData.length, desc: 'Active SKUs in database' },
-                { metric: 'Total QC Operations', value: allQc.reduce((a, b) => a + b, 0), desc: 'Sum of all QC checks' },
-                { metric: 'Max Images on SKU', value: Math.max(...allImages), desc: 'Highest image count' },
-                { metric: 'Max QC Checks', value: Math.max(...allQc), desc: 'Highest QC count' },
-                { metric: 'Avg Days Gap', value: (allGaps.reduce((a, b) => a + b, 0) / allGaps.length).toFixed(2), desc: 'Avg image to QC time' },
-                { metric: 'Total Image Uploads', value: allImages.reduce((a, b) => a + b, 0), desc: 'Total images across all SKUs' },
-                { metric: 'SKUs with QC', value: rawData.filter(r => parseInt(r.qc_done_count) > 0).length, desc: 'SKUs with at least 1 QC' },
-                { metric: 'Pending QC', value: rawData.filter(r => !r.latest_qc_done_time).length, desc: 'SKUs without QC completion' }
-            ];
-
-            const tbody = document.getElementById('stats-tbody');
-            tbody.innerHTML = stats.map(s => `
-                <tr>
-                    <td><strong>${s.metric}</strong></td>
-                    <td><strong>${s.value}</strong></td>
-                    <td>${s.desc}</td>
-                </tr>
-            `).join('');
-        }
-
-        function destroyChart(chartId) {
-            if (chartInstances[chartId]) {
-                chartInstances[chartId].destroy();
-                delete chartInstances[chartId];
-            }
-        }
-
-        function parseCSVData() {
-            try {
-                const csvText = document.getElementById('csv-input').value.trim();
-                if (!csvText) {
-                    alert('Please paste CSV data');
-                    return;
-                }
-
-                const lines = csvText.split('\n');
-                if (lines.length < 2) {
-                    throw new Error('CSV must have header row and data rows');
-                }
-
-                // Parse header
-                const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/"/g, ''));
+                const fullUrl = `${url}/api/public/card/${questionId}/query/json`;
+                const response = await fetch(fullUrl);
                 
-                // Parse data rows
-                rawData = [];
-                for (let i = 1; i < lines.length; i++) {
-                    const line = lines[i].trim();
-                    if (!line) continue;
-
-                    const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
-                    const record = {};
-                    
-                    headers.forEach((header, idx) => {
-                        // Map column names
-                        let mappedName = header;
-                        if (header.includes('sku_id')) mappedName = 'sku_id';
-                        else if (header.includes('created')) mappedName = 'sku_created_on';
-                        else if (header.includes('image_added')) mappedName = 'latest_image_added_time';
-                        else if (header.includes('qc_done_time')) mappedName = 'latest_qc_done_time';
-                        else if (header.includes('qc_done_count')) mappedName = 'qc_done_count';
-                        else if (header.includes('distinct') || header.includes('disticnt')) mappedName = 'disticnt_image_count';
-                        else if (header.includes('addon')) mappedName = 'image_addon_count';
-                        else if (header.includes('days_between')) mappedName = 'days_between_latest_image_and_qc_done';
-                        
-                        record[mappedName] = values[idx] || '';
-                    });
-                    
-                    rawData.push(record);
+                if (response.ok) {
+                    showMessage('✅ Connection successful! Click "Refresh Data" to load your Metabase data.', 'success');
+                } else {
+                    showMessage('❌ Connection failed. Check your Metabase URL and Question ID.', 'error');
                 }
-
-                if (rawData.length === 0) {
-                    throw new Error('No valid data rows found');
-                }
-
-                console.log('CSV parsed:', rawData.length, 'records');
-                document.getElementById('manual-input').style.display = 'none';
-                processData();
-                renderDashboard();
-                updateStatus('Loaded from CSV', true);
-
             } catch (error) {
-                alert('Error parsing CSV: ' + error.message);
-                console.error(error);
+                showMessage(`❌ Error: ${error.message}`, 'error');
             }
         }
 
-        // Auto-refresh every 5 minutes
-        setInterval(fetchData, 5 * 60 * 1000);
+        async function loadData() {
+            const url = document.getElementById('metabaseUrl').value;
+            const questionId = document.getElementById('questionId').value;
 
-        // Initial load
-        fetchData();
+            showMessage('Loading data from Metabase...', 'loading');
+
+            try {
+                const fullUrl = `${url}/api/public/card/${questionId}/query/json`;
+                const response = await fetch(fullUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                processData(data);
+                showMessage('✅ Data loaded successfully!', 'success');
+            } catch (error) {
+                showMessage(`❌ Error loading data: ${error.message}`, 'error');
+            }
+        }
+
+        function loadCSVData() {
+            const file = document.getElementById('csvFile').files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const csv = e.target.result;
+                const rows = csv.split('\n').slice(1).map(row => {
+                    const [sku_id, sku_created_on, latest_image_added_on, distinct_image_count, qc_done_count, enterprise_name, cs_poc_email] = row.split(',');
+                    return { sku_id, sku_created_on, latest_image_added_on, distinct_image_count, qc_done_count, enterprise_name, cs_poc_email };
+                }).filter(row => row.sku_id);
+
+                dashboardData.rows = rows;
+                updateDashboard();
+                showMessage('✅ CSV data loaded successfully!', 'success');
+            };
+            reader.readAsText(file);
+        }
+
+        function processData(data) {
+            // Handle both array and Metabase response format
+            const rows = Array.isArray(data) ? data : (data.data && data.data.rows ? data.data.rows : []);
+            dashboardData.rows = rows;
+            dashboardData.lastUpdate = new Date();
+            updateDashboard();
+        }
+
+        function updateDashboard() {
+            const rows = dashboardData.rows;
+            
+            if (rows.length === 0) {
+                showMessage('No data available. Please load data first.', 'error');
+                return;
+            }
+
+            updateMetrics(rows);
+            updateCharts(rows);
+            updateTables(rows);
+            updateTimestamp();
+        }
+
+        function updateMetrics(rows) {
+            const today = new Date().toISOString().split('T')[0];
+            
+            // Total SKUs
+            document.getElementById('totalSkus').textContent = rows.length;
+            
+            // Reprocessed today
+            const reprocessedToday = rows.filter(r => {
+                const dateCol = r['latest_image_added_on'] || r[2];
+                return dateCol && dateCol.includes(today);
+            }).length;
+            document.getElementById('reprocessedToday').textContent = reprocessedToday;
+            
+            // Avg QC time
+            let totalQcTime = 0;
+            let qcCount = 0;
+            rows.forEach(r => {
+                const qcTime = parseFloat(r['days_betweem_latest_image_and-image_qc_done'] || r[11] || 0);
+                if (qcTime > 0) {
+                    totalQcTime += qcTime * 24;
+                    qcCount++;
+                }
+            });
+            const avgQcTime = qcCount > 0 ? (totalQcTime / qcCount).toFixed(1) : 0;
+            document.getElementById('avgQcTime').textContent = avgQcTime;
+            
+            // Active enterprises
+            const enterprises = new Set(rows.map(r => r['enterprise_name'] || r[14])).size;
+            document.getElementById('activeEnterprises').textContent = enterprises;
+        }
+
+        function updateCharts(rows) {
+            // Daily trend
+            const dailyData = {};
+            rows.forEach(r => {
+                const date = (r['latest_image_added_on'] || r[2] || '').split('T')[0];
+                if (date) {
+                    dailyData[date] = (dailyData[date] || 0) + 1;
+                }
+            });
+
+            const sortedDates = Object.keys(dailyData).sort().slice(-30);
+            const trendData = sortedDates.map(d => dailyData[d]);
+
+            if (chartInstances.trend) chartInstances.trend.destroy();
+            chartInstances.trend = new Chart(document.getElementById('trendChart'), {
+                type: 'line',
+                data: {
+                    labels: sortedDates.map(d => d.split('-')[2]),
+                    datasets: [{
+                        label: 'SKUs Reprocessed',
+                        data: trendData,
+                        borderColor: '#378ADD',
+                        backgroundColor: 'rgba(55, 138, 221, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // QC Status
+            const qcPassed = rows.filter(r => r['qc_done_count'] > 0).length;
+            const qcPending = rows.filter(r => r['qc_done_count'] === 0).length;
+
+            if (chartInstances.qc) chartInstances.qc.destroy();
+            chartInstances.qc = new Chart(document.getElementById('qcChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['QC Completed', 'Pending QC'],
+                    datasets: [{
+                        data: [qcPassed, qcPending],
+                        backgroundColor: ['#639922', '#BA7517']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+
+        function updateTables(rows) {
+            // Enterprise breakdown
+            const enterpriseStats = {};
+            rows.forEach(r => {
+                const enterprise = r['enterprise_name'] || r[14] || 'Unknown';
+                if (!enterpriseStats[enterprise]) {
+                    enterpriseStats[enterprise] = {
+                        today: 0,
+                        total: 0,
+                        arr: 0,
+                        segment: r['customer-segment'] || r[13] || 'N/A'
+                    };
+                }
+                enterpriseStats[enterprise].total++;
+                
+                const today = new Date().toISOString().split('T')[0];
+                if ((r['latest_image_added_on'] || r[2] || '').includes(today)) {
+                    enterpriseStats[enterprise].today++;
+                }
+            });
+
+            const enterpriseRows = Object.entries(enterpriseStats)
+                .sort((a, b) => b[1].today - a[1].today)
+                .slice(0, 10)
+                .map(([name, stats]) => `
+                    <tr>
+                        <td>${name}</td>
+                        <td>${stats.today}</td>
+                        <td>${(stats.total / 7).toFixed(1)}</td>
+                        <td>${stats.arr || 'N/A'}</td>
+                        <td>${stats.segment}</td>
+                    </tr>
+                `).join('');
+            
+            document.getElementById('enterpriseTable').innerHTML = enterpriseRows || '<tr><td colspan="5" style="text-align: center;">No data</td></tr>';
+
+            // POC breakdown
+            const pocStats = {};
+            rows.forEach(r => {
+                const email = r['cs_poc_email'] || r[15] || 'Unknown';
+                if (!pocStats[email]) {
+                    pocStats[email] = {
+                        today: 0,
+                        total: 0,
+                        avgDays: 0,
+                        daysCounts: []
+                    };
+                }
+                pocStats[email].total++;
+                
+                const today = new Date().toISOString().split('T')[0];
+                if ((r['latest_image_added_on'] || r[2] || '').includes(today)) {
+                    pocStats[email].today++;
+                }
+                
+                const days = parseFloat(r['days_betweem_latest_image_and-image_qc_done'] || r[11] || 0);
+                if (days > 0) pocStats[email].daysCounts.push(days);
+            });
+
+            const pocRows = Object.entries(pocStats)
+                .sort((a, b) => b[1].today - a[1].today)
+                .slice(0, 10)
+                .map(([email, stats]) => {
+                    const avgDays = stats.daysCounts.length > 0 
+                        ? (stats.daysCounts.reduce((a, b) => a + b) / stats.daysCounts.length).toFixed(1)
+                        : 'N/A';
+                    const reprocessRate = ((stats.today / stats.total) * 100).toFixed(1);
+                    return `
+                        <tr>
+                            <td>${email}</td>
+                            <td>${stats.today}</td>
+                            <td>${avgDays}</td>
+                            <td>${stats.total}</td>
+                            <td>${reprocessRate}%</td>
+                        </tr>
+                    `;
+                }).join('');
+            
+            document.getElementById('pocTable').innerHTML = pocRows || '<tr><td colspan="5" style="text-align: center;">No data</td></tr>';
+        }
+
+        function updateTimestamp() {
+            const now = new Date().toLocaleTimeString();
+            document.getElementById('lastUpdate').textContent = now;
+            document.getElementById('recordCount').textContent = dashboardData.rows.length;
+        }
+
+        function showMessage(message, type) {
+            const messageArea = document.getElementById('messageArea');
+            const className = type === 'loading' ? 'loading' : type;
+            
+            let content = message;
+            if (type === 'loading') {
+                content = '<div class="spinner"></div><p>' + message + '</p>';
+            }
+            
+            messageArea.innerHTML = `<div class="${className}">${content}</div>`;
+            
+            if (type !== 'loading') {
+                setTimeout(() => {
+                    messageArea.innerHTML = '';
+                }, 5000);
+            }
+        }
+
+        function exportData() {
+            if (dashboardData.rows.length === 0) {
+                alert('No data to export. Load data first.');
+                return;
+            }
+
+            const headers = Object.keys(dashboardData.rows[0]);
+            const csv = [headers.join(',')];
+            
+            dashboardData.rows.forEach(row => {
+                const values = headers.map(h => {
+                    const val = row[h] || '';
+                    return typeof val === 'string' && val.includes(',') ? `"${val}"` : val;
+                });
+                csv.push(values.join(','));
+            });
+
+            const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `sku-dashboard-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        }
+
+        function downloadSampleData() {
+            const sample = `sb.sku_id,sku_created_on,latest_image_added_on,distinct_image_count,qc_done_count,enterprise_name,cs_poc_email
+SKU001,2024-01-01,2024-12-05,5,3,Enterprise A,john.doe@company.com
+SKU002,2024-01-02,2024-12-05,3,2,Enterprise B,jane.smith@company.com
+SKU003,2024-01-03,2024-12-04,4,4,Enterprise A,john.doe@company.com
+SKU004,2024-01-04,2024-12-04,2,1,Enterprise C,mike.johnson@company.com`;
+
+            const blob = new Blob([sample], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'sample-data.csv';
+            a.click();
+        }
+
+        function scheduleAutoRefresh() {
+            const interval = parseInt(document.getElementById('refreshInterval').value) || 15;
+            setInterval(loadData, interval * 60 * 1000);
+            alert(`Auto-refresh enabled every ${interval} minutes`);
+        }
+
+        // Auto-load data on page load from Metabase
+        window.addEventListener('load', () => {
+            // Attempt to load from Metabase on startup
+            loadData();
+        });
     </script>
 </body>
 </html>
