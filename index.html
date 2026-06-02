@@ -567,13 +567,16 @@
             showMessage('Testing connection...', 'loading');
 
             try {
-                const fullUrl = `${url}/api/public/card/${questionId}/query/json`;
-                const response = await fetch(fullUrl);
+                // Use Vercel API proxy
+                const apiUrl = `/api/getData?metabaseUrl=${encodeURIComponent(url)}&questionId=${encodeURIComponent(questionId)}`;
+                const response = await fetch(apiUrl);
                 
                 if (response.ok) {
-                    showMessage('✅ Connection successful! Click "Refresh Data" to load your Metabase data.', 'success');
+                    const result = await response.json();
+                    showMessage(`✅ Connection successful! Found ${result.recordCount} records.`, 'success');
                 } else {
-                    showMessage('❌ Connection failed. Check your Metabase URL and Question ID.', 'error');
+                    const errorData = await response.json();
+                    showMessage(`❌ Connection failed: ${errorData.error}. ${errorData.details || ''}`, 'error');
                 }
             } catch (error) {
                 showMessage(`❌ Error: ${error.message}`, 'error');
@@ -587,18 +590,30 @@
             showMessage('Loading data from Metabase...', 'loading');
 
             try {
-                const fullUrl = `${url}/api/public/card/${questionId}/query/json`;
-                const response = await fetch(fullUrl);
+                // Use Vercel API proxy to bypass CORS
+                const apiUrl = `/api/getData?metabaseUrl=${encodeURIComponent(url)}&questionId=${encodeURIComponent(questionId)}`;
+                
+                console.log('Fetching from API:', apiUrl);
+                
+                const response = await fetch(apiUrl);
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorData = await response.json();
+                    throw new Error(`${errorData.error}: ${errorData.message || errorData.details || ''}`);
                 }
 
-                const data = await response.json();
-                processData(data);
-                showMessage('✅ Data loaded successfully!', 'success');
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Unknown error');
+                }
+                
+                console.log('Data received:', result.recordCount, 'records');
+                processData(result.data);
+                showMessage(`✅ Data loaded successfully! (${result.recordCount} records)`, 'success');
             } catch (error) {
-                showMessage(`❌ Error loading data: ${error.message}`, 'error');
+                console.error('Error:', error);
+                showMessage(`❌ Error loading data: ${error.message}. Check console for details.`, 'error');
             }
         }
 
